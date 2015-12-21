@@ -1,0 +1,12 @@
+<configuration debug="false">
+	<appender name="FILE" class="ch.qos.logback.core.FileAppender">
+		<file>${java.io.tmpdir}/mathematics.log</file>
+		<append>true</append>
+		<encoder>
+			<pattern>%d{HH:mm:ss.SSS} %-5level %logger{64}:%L\n\t%msg%n</pattern>
+		</encoder>
+	</appender>
+	<root level="debug">
+		<appender-ref ref="FILE" />
+	</root>
+</configuration>

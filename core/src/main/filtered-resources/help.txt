@@ -1,0 +1,17 @@
+java <sytemPropertySpecification>... -jar ${finalName}.jar <arg>...
+
+sytemPropertySpecification: -Dkey=value
+
+Possibilities
+-------------
+
+
+-DpropertyFile=<pathToPropertyFile>
+
+-Dlogback.configurationFile=<pathToLogbackConfigurationFile>
+
+-DdataFile=<pathToDataFile>
+If none specified the file math-new.script will be created in the working directory
+
+-DdataFileProperties=<pathToDataFilePropertiesFile>
+If none specified the file math-new.properties will be created in the working directory
