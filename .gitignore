@@ -1,0 +1,8 @@
+# Maven default output directory
+target/
+# backup files
+*~
+# Hidden directories and files
+.*
+# Incorporate the .gitignore in the root directory
+!/.gitignore
