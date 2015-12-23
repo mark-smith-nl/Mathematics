@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
+import nl.smith.mathematics.functions.AbstractFunction;
 import nl.smith.mathematics.number.NumberOperations;
 
 import org.apache.commons.lang.IllegalClassException;
@@ -23,6 +24,30 @@ import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Helper class to create a context associated with a class extending {@link AbstractFunction}. <br>
+ * The context is retrieved from a property file which resides in the same package as the class associated with the context.<br>
+ * An empty context for a class is returned if no property file can be found.<br>
+ * If a property file is found it is used to create a Properties instance.<br>
+ * If a System property with the same name as defined in the Properties instance is defined, this property is added to the Properties instance.<br>
+ * The values in the Properties instance are parsed to result a an instance of the (in the file) defined class.<br>
+ * <br>
+ * The following syntax is used to define a property value/property type pair in a property file:<br>
+ * <br>
+ * fullyQualifiedClassName.propertName=value<br>
+ * fullyQualifiedClassName.propertName.type=classnameOfThePropertyInTheEnclosingClass<br>
+ * <br>
+ * The specification of the type is optional. If not specified, a String type in parsing the property value.<br>
+ * <br>
+ * Example:<br>
+ * <br>
+ * nl.smith.mathematics.functions.rational.GoniometricFunctionsImpl.angleType= DEG<br>
+ * nl.smith.mathematics.functions.rational.GoniometricFunctionsImpl.angleType.type=nl.smith.mathematics.functions.AngleType<br>
+ * <br>
+ * Accepted types: Enum, Boolean, String, Integer, BigInteger, BigDecimal, {@link DateTime} and types extending {@link NumberOperations} are accepted.<br>
+ * <br>
+ * In case the specified type extends {@link NumberOperations} the static public method valueOf(String) is used to parse the value.<br>
+ */
 public class FunctionContextHelper {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(FunctionContextHelper.class);
@@ -40,7 +65,7 @@ public class FunctionContextHelper {
 		throw new IllegalAccessError();
 	}
 
-	public static Map<String, Object> makeFunctionContext(Class<?> clazz) {
+	public static <T extends AbstractFunction> Map<String, Object> makeFunctionContext(Class<T> clazz) {
 		if (clazz == null) {
 			throw new IllegalArgumentException("No clazz provided");
 		}
