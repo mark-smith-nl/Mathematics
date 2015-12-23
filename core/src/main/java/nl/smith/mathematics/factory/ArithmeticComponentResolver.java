@@ -5,7 +5,11 @@ import static nl.smith.mathematics.factory.constant.ArithmeticComponentName.DIVI
 import static nl.smith.mathematics.factory.constant.ArithmeticComponentName.MULTIPLICATION;
 import static nl.smith.mathematics.factory.constant.ArithmeticComponentName.NEGATION;
 import static nl.smith.mathematics.factory.constant.ArithmeticComponentName.SUBTRACTION;
+import static nl.smith.mathematics.utility.ErrorMessages.EXPRESSION_DOES_NOT_START_WITH_UNARY_OPERATION;
+import static nl.smith.mathematics.utility.ErrorMessages.IMPLEMENT_ERROR_MESSAGE;
+import static nl.smith.mathematics.utility.ErrorMessages.METHOD_NOT_FOUND;
 import static nl.smith.mathematics.utility.ErrorMessages.NOT_A_NUMBER;
+import static nl.smith.mathematics.utility.ErrorMessages.UNEXPECTED_CONTENT_OPERATION;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -33,7 +37,6 @@ import nl.smith.mathematics.factory.stack.element.UnaryOperator;
 import nl.smith.mathematics.factory.stack.element.Variable;
 import nl.smith.mathematics.invoker.MathematicalFunctionInvoker;
 import nl.smith.mathematics.number.NumberOperations;
-import nl.smith.mathematics.utility.ErrorMessages;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -293,9 +296,10 @@ public class ArithmeticComponentResolver {
 
 			offSetUnaryOperation = matcher.end();
 		} else {
-			throw new IllegalArgumentException(ErrorMessages.EXPRESSION_DOES_NOT_START_WITH_UNARY_OPERATION.getFormattedErrorMessage(expression
-					.getExpressionStringAggregate().getCaretedStringForPositions(ExpressionStringAggregate.ShowCaretString.IN_TRIMMED_EXPRESSION, true,
-							expression.getStartPosition())));
+			EXPRESSION_DOES_NOT_START_WITH_UNARY_OPERATION.throwUncheckedException(
+					IllegalArgumentException.class,
+					expression.getExpressionStringAggregate().getCaretedStringForPositions(ExpressionStringAggregate.ShowCaretString.IN_TRIMMED_EXPRESSION,
+							true, expression.getStartPosition()));
 		}
 
 		// Remove the unary operation part
@@ -324,10 +328,11 @@ public class ArithmeticComponentResolver {
 
 		expressionString = expressionString.substring(expectedBeginPosition);
 		if (StringUtils.isNotEmpty(expressionString)) {
-			throw new IllegalArgumentException(ErrorMessages.UNEXPECTED_CONTENT_OPERATION.getFormattedErrorMessage(
+			UNEXPECTED_CONTENT_OPERATION.throwUncheckedException(
+					IllegalArgumentException.class,
 					expressionString,
 					expression.getExpressionStringAggregate().getCaretedStringForPositions(ExpressionStringAggregate.ShowCaretString.IN_TRIMMED_EXPRESSION,
-							true, expression.getRealPosition(offSetUnaryOperation + expectedBeginPosition))));
+							true, expression.getRealPosition(offSetUnaryOperation + expectedBeginPosition)));
 		}
 
 		return arithmeticExpressionStack;
@@ -348,7 +353,7 @@ public class ArithmeticComponentResolver {
 			ArithmeticComponentRegularExpression arithmeticComponentRegularExpression) {
 		ArithmeticExpressionStack operationArithmeticExpressionStack = new ArithmeticExpressionStack();
 
-		List<ArithmeticComponentStructure> unaryStructures;
+		List<ArithmeticComponentStructure> unaryStructures = null;
 		if (ArithmeticComponentRegularExpression.BINARY_OPERATION == arithmeticComponentRegularExpression) {
 			List<ArithmeticComponentStructure> binaryStructures = arithmeticComponentRegularExpression.getArithmeticComponentStructures();
 			// Determine binary operator
@@ -359,7 +364,7 @@ public class ArithmeticComponentResolver {
 				LOGGER.debug("Adding to stack : {}", binaryOperatorsMap.get(arithmeticComponentName));
 				operationArithmeticExpressionStack.add(unaryOperatorsMap.get(arithmeticComponentName));
 			} else {
-				throw new IllegalArgumentException(ErrorMessages.IMPLEMENT_ERROR_MESSAGE.getFormattedErrorMessage("Illegal argument"));
+				IMPLEMENT_ERROR_MESSAGE.throwUncheckedException(IllegalArgumentException.class, "Illegal argument");
 			}
 
 			arithmeticComponentName = ArithmeticComponentName.UNARY_OPERATION;
@@ -368,7 +373,7 @@ public class ArithmeticComponentResolver {
 		} else if (ArithmeticComponentRegularExpression.UNARY_OPERATION == arithmeticComponentRegularExpression) {
 			unaryStructures = arithmeticComponentRegularExpression.getArithmeticComponentStructures();
 		} else {
-			throw new IllegalArgumentException(ErrorMessages.IMPLEMENT_ERROR_MESSAGE.getFormattedErrorMessage("Illegal argument"));
+			IMPLEMENT_ERROR_MESSAGE.throwUncheckedException(IllegalArgumentException.class, "Illegal argument");
 		}
 
 		ArithmeticExpressionStack unaryOperationArithmeticExpressionStack = buildUnaryOperationArithmeticExpressionStack(matcher, multiDimensionalExpression,
@@ -411,8 +416,8 @@ public class ArithmeticComponentResolver {
 		value = matcher.group(subStructure.getGroupIndex());
 		if (StringUtils.isNotBlank(value)) {
 			if (multiDimensionalExpression.getDimension() != 1) {
-				throw new IllegalArgumentException(
-						ErrorMessages.IMPLEMENT_ERROR_MESSAGE.getFormattedErrorMessage("Implement message: first element must always have dimension 1"));
+				IMPLEMENT_ERROR_MESSAGE.throwUncheckedException(IllegalArgumentException.class,
+						"Implement message: first element must always have dimension 1");
 			}
 			anyNumberEquivalentDetermined = true;
 			arithmeticExpressionStack.add(new SubExpressionStack());
@@ -427,8 +432,8 @@ public class ArithmeticComponentResolver {
 				SimpleEntry<Object, Method> proxyClassMethodPair = mathematicalFunctionInvoker.getProxyMethodPairForAlias(value, dimension);
 				if (proxyClassMethodPair == null) {
 					String argumentType = mathematicalFunctionInvoker.getNumberClass().getSimpleName();
-					throw new IllegalArgumentException(ErrorMessages.METHOD_NOT_FOUND.getFormattedErrorMessage(value + "(" + argumentType
-							+ StringUtils.repeat(", " + argumentType, dimension - 1) + ")"));
+					METHOD_NOT_FOUND.throwUncheckedException(IllegalArgumentException.class,
+							value + "(" + argumentType + StringUtils.repeat(", " + argumentType, dimension - 1) + ")");
 				}
 				arithmeticExpressionStack.add(new Function(proxyClassMethodPair.getKey(), proxyClassMethodPair.getValue(), dimension));
 			}
@@ -469,8 +474,7 @@ public class ArithmeticComponentResolver {
 		}
 
 		if (!anyNumberEquivalentDetermined) {
-			throw new IllegalArgumentException(
-					ErrorMessages.IMPLEMENT_ERROR_MESSAGE.getFormattedErrorMessage("Implement message: anyNumberEquivalentDetermined false"));
+			IMPLEMENT_ERROR_MESSAGE.throwUncheckedException(IllegalArgumentException.class, "Implement message: anyNumberEquivalentDetermined false");
 		}
 
 		return arithmeticExpressionStack;

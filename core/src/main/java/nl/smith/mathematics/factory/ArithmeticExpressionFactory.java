@@ -1,7 +1,9 @@
 package nl.smith.mathematics.factory;
 
 import static nl.smith.mathematics.factory.ExpressionStringAggregate.ShowCaretString.IN_BOTH_EXPRESSIONS;
+import static nl.smith.mathematics.utility.ErrorMessages.EXPRESSION_EXPECTED;
 import static nl.smith.mathematics.utility.ErrorMessages.ILLEGAL_USAGE_OF_RESERVED_CHARACTERS;
+import static nl.smith.mathematics.utility.ErrorMessages.UNCLOSED_EXPRESSIONS;
 import static nl.smith.mathematics.utility.ErrorMessages.UNEXPECTED_DIMENSION_TOKEN_FOUND;
 import static nl.smith.mathematics.utility.ErrorMessages.UNEXPECTED_END_TOKEN_FOUND;
 
@@ -17,7 +19,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import nl.smith.mathematics.factory.stack.ArithmeticExpressionStack;
-import nl.smith.mathematics.utility.ErrorMessages;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
@@ -25,7 +26,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Class for parsing raw expression strings into an {@link ArithmeticExpressionStack}
+ * Class for parsing raw expression strings into an
+ * {@link ArithmeticExpressionStack}
  */
 public final class ArithmeticExpressionFactory {
 
@@ -79,13 +81,18 @@ public final class ArithmeticExpressionFactory {
 		// return buildArithmeticExpressionStack(expression);
 	}
 
-	// private ArithmeticExpressionStack buildArithmeticExpressionStack(Expression expression) {
-	// ArithmeticExpressionStack arithmeticExpressionStack = buildArithmeticExpressionStackStub(expressionStringAggregate, expression.getContentWithoutAggregationTokens());
+	// private ArithmeticExpressionStack
+	// buildArithmeticExpressionStack(Expression expression) {
+	// ArithmeticExpressionStack arithmeticExpressionStack =
+	// buildArithmeticExpressionStackStub(expressionStringAggregate,
+	// expression.getContentWithoutAggregationTokens());
 	//
-	// List<SubExpressionStack> subExpressionStacks = arithmeticExpressionStack.getSubExpressionStacks();
+	// List<SubExpressionStack> subExpressionStacks =
+	// arithmeticExpressionStack.getSubExpressionStacks();
 	// List<Expression> subExpressions = expression.getSubExpressions();
 	// for (int i = 0; i < subExpressionStacks.size(); i++) {
-	// subExpressionStacks.get(i).setStack(buildArithmeticExpressionStack(expressionStringAggregate, subExpressions.get(i)));
+	// subExpressionStacks.get(i).setStack(buildArithmeticExpressionStack(expressionStringAggregate,
+	// subExpressions.get(i)));
 	// }
 	//
 	// return arithmeticExpressionStack;
@@ -126,27 +133,34 @@ public final class ArithmeticExpressionFactory {
 			endPosition = startPosition + 1;
 
 			if (aggregationTokenPairs.containsKey(token)) {
-				// Encountered a start token signaling the a new multiDimensionalExpression should be created
-				currentMultiDimensionalExpression = new MultiDimensionalExpression(expressionStringAggregate, startPosition, token, aggregationTokenPairs.get(token));
+				// Encountered a start token signaling the a new
+				// multiDimensionalExpression should be created
+				currentMultiDimensionalExpression = new MultiDimensionalExpression(expressionStringAggregate, startPosition, token,
+						aggregationTokenPairs.get(token));
 				multiDimensionalExpressionStack.add(currentMultiDimensionalExpression);
 				currentExpression = null;
 			} else {
-				// Encountered a token signaling an expression should be terminated and added its parent i.e. the currentMultiDimensionalExpression
+				// Encountered a token signaling an expression should be
+				// terminated and added its parent i.e. the
+				// currentMultiDimensionalExpression
 				// There should have been expression
 				validateCurrentExpressionNotNull(expressionStringAggregate, startPosition, currentExpression);
 				currentExpression.finalize();
 				expressionStack.remove(currentExpression);
 
-				// There should have been an multidimensional expression which the currentExpression should be added to
+				// There should have been an multidimensional expression which
+				// the currentExpression should be added to
 				validateCurrentMultiDimensionalExpressionNotNull(expressionStringAggregate, startPosition, currentMultiDimensionalExpression, token);
 				currentMultiDimensionalExpression.addExpression(currentExpression);
 
 				if (MultiDimensionalExpression.DIMENSION_SEPERATOR == token) {
-					// Encountered a dimension token signaling the dimension of the currentMultiDimensionalExpression should be increased
+					// Encountered a dimension token signaling the dimension of
+					// the currentMultiDimensionalExpression should be increased
 					// Reset the currentExpression
 					currentExpression = null;
 				} else {
-					// Encountered an end token signaling the currentMultiDimensionalExpression should be closed
+					// Encountered an end token signaling the
+					// currentMultiDimensionalExpression should be closed
 					currentMultiDimensionalExpression.addEndTokenAndFinalize(token);
 					multiDimensionalExpressionStack.remove(currentMultiDimensionalExpression);
 
@@ -179,9 +193,8 @@ public final class ArithmeticExpressionFactory {
 
 	private static void validateCurrentExpressionNotNull(ExpressionStringAggregate expressionStringAggregate, int startPosition, Expression currentExpression) {
 		if (currentExpression == null) {
-			throw new IllegalArgumentException(ErrorMessages.EXPRESSION_EXPECTED.getFormattedErrorMessage(
-					expressionStringAggregate.getCaretedStringForPositions(
-							ExpressionStringAggregate.ShowCaretString.IN_BOTH_EXPRESSIONS, true, startPosition - 1)));
+			EXPRESSION_EXPECTED.throwUncheckedException(IllegalArgumentException.class, expressionStringAggregate.getCaretedStringForPositions(
+					ExpressionStringAggregate.ShowCaretString.IN_BOTH_EXPRESSIONS, true, startPosition - 1));
 		}
 	}
 
@@ -189,24 +202,22 @@ public final class ArithmeticExpressionFactory {
 			MultiDimensionalExpression currentMultiDimensionalExpression, char token) {
 		if (currentMultiDimensionalExpression == null) {
 			if (MultiDimensionalExpression.DIMENSION_SEPERATOR == token) {
-				throw new IllegalArgumentException(UNEXPECTED_DIMENSION_TOKEN_FOUND.getFormattedErrorMessage(
-						token,
-						expressionStringAggregate.getCaretedStringForPositions(IN_BOTH_EXPRESSIONS, true, startPosition)));
+				UNEXPECTED_DIMENSION_TOKEN_FOUND.throwUncheckedException(IllegalArgumentException.class, token,
+						expressionStringAggregate.getCaretedStringForPositions(IN_BOTH_EXPRESSIONS, true, startPosition));
 			}
-			throw new IllegalArgumentException(UNEXPECTED_END_TOKEN_FOUND.getFormattedErrorMessage(
-					token,
-					expressionStringAggregate.getCaretedStringForPositions(IN_BOTH_EXPRESSIONS, true, startPosition)));
+			UNEXPECTED_END_TOKEN_FOUND.throwUncheckedException(IllegalArgumentException.class, token,
+					expressionStringAggregate.getCaretedStringForPositions(IN_BOTH_EXPRESSIONS, true, startPosition));
 		}
 	}
 
 	/*
 	 * Method creates an expression if the supplied currentExpression is null.
-	 * If a new expression is created this expression is pushed on the supplied expressionStack.
-	 * Adds the content to the supplied or created expression and returns the supplied or created expression.
+	 * If a new expression is created this expression is pushed on the supplied
+	 * expressionStack. Adds the content to the supplied or created expression
+	 * and returns the supplied or created expression.
 	 */
 	private static Expression getCurrentExpressionWithAddedContent(Expression currentExpression, List<Expression> expressionStack,
-			ExpressionStringAggregate expressionStringAggregate,
-			int startPosition, String content) {
+			ExpressionStringAggregate expressionStringAggregate, int startPosition, String content) {
 
 		Expression currentExpressionWithAddedContent = currentExpression;
 
@@ -233,13 +244,9 @@ public final class ArithmeticExpressionFactory {
 				expectedEndTokens.add(multiDimensionalExpression.getExpectedEndToken());
 			}
 
-			throw new IllegalArgumentException(ErrorMessages.UNCLOSED_EXPRESSIONS.getFormattedErrorMessage(
-					StringUtils.join(expectedEndTokens, ", "),
-					expressionStringAggregate.getCaretedStringForPositions(
-							ExpressionStringAggregate.ShowCaretString.IN_BOTH_EXPRESSIONS,
-							true,
-							startPositions)
-					));
+			UNCLOSED_EXPRESSIONS
+					.throwUncheckedException(IllegalArgumentException.class, StringUtils.join(expectedEndTokens, ", "), expressionStringAggregate
+							.getCaretedStringForPositions(ExpressionStringAggregate.ShowCaretString.IN_BOTH_EXPRESSIONS, true, startPositions));
 		}
 	}
 
@@ -247,11 +254,9 @@ public final class ArithmeticExpressionFactory {
 		char[] reservedCharacters = new char[] { Expression.EXPRESSION_PLACE_HOLDER };
 		Set<Integer> positionsReservedCharacters = expressionStringAggregate.getPositionsReservedCharacters(reservedCharacters);
 		if (!positionsReservedCharacters.isEmpty()) {
-			String errorMessage = ILLEGAL_USAGE_OF_RESERVED_CHARACTERS.getFormattedErrorMessage(
-					StringUtils.join(ArrayUtils.toObject(reservedCharacters), ' '),
-					StringUtils.join(positionsReservedCharacters.toArray(), ", "),
+			ILLEGAL_USAGE_OF_RESERVED_CHARACTERS.throwUncheckedException(IllegalArgumentException.class,
+					StringUtils.join(ArrayUtils.toObject(reservedCharacters), ' '), StringUtils.join(positionsReservedCharacters.toArray(), ", "),
 					expressionStringAggregate.getCaretedStringForPositions(IN_BOTH_EXPRESSIONS, true, positionsReservedCharacters));
-			throw new IllegalArgumentException(errorMessage);
 		}
 	}
 

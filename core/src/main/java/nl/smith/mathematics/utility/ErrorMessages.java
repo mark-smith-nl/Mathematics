@@ -1,6 +1,13 @@
 package nl.smith.mathematics.utility;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public enum ErrorMessages {
+
 	IMPLEMENT_ERROR_MESSAGE("Implement error message %s"),
 
 	/**
@@ -8,44 +15,40 @@ public enum ErrorMessages {
 	 * <ol>
 	 * <li>%s: all reserved characters</li>
 	 * <li>%s: positions used reserved characters</li>
-	 * <li>%s: (concatenated, initialExpression and trimmedExpression) input string(s) supplied with carets to point to positions of interest</li>
+	 * <li>%s: (concatenated, initialExpression and trimmedExpression) input
+	 * string(s) supplied with carets to point to positions of interest</li>
 	 * </ol>
 	 */
-	ILLEGAL_USAGE_OF_RESERVED_CHARACTERS(
-			"Expression string contains a character from the reserved character set\n"
-					+ "Please remove these characters\n"
-					+ "Reserved character(s): %s\n"
-					+ "Positions (zero based): %s\n" +
-					"%s"),
+	ILLEGAL_USAGE_OF_RESERVED_CHARACTERS("Expression string contains a character from the reserved character set\n" + "Please remove these characters\n"
+			+ "Reserved character(s): %s\n" + "Positions (zero based): %s\n" + "%s"),
 
 	/**
 	 * Formatter string contains the following place holder(s) specifying:<br>
 	 * <ol>
 	 * <li>%c: unexpected dimension token</li>
-	 * <li>%s: (concatenated, initialExpression and trimmedExpression) input string(s) supplied with carets to point to positions of interest</li>
+	 * <li>%s: (concatenated, initialExpression and trimmedExpression) input
+	 * string(s) supplied with carets to point to positions of interest</li>
 	 * </ol>
 	 */
-	UNEXPECTED_DIMENSION_TOKEN_FOUND("Unexpected dimension token found: '%c'\n"
-			+ "Could not find corresponding enclosing expression.\n"
-			+ "%s"),
+	UNEXPECTED_DIMENSION_TOKEN_FOUND("Unexpected dimension token found: '%c'\n" + "Could not find corresponding enclosing expression.\n" + "%s"),
 
 	/**
 	 * Formatter string contains the following place holder(s) specifying:<br>
 	 * <ol>
 	 * <li>%c: unexpected end token</li>
-	 * <li>%s: (concatenated, initialExpression and trimmedExpression) input string(s) supplied with carets to point to positions of interest</li>
+	 * <li>%s: (concatenated, initialExpression and trimmedExpression) input
+	 * string(s) supplied with carets to point to positions of interest</li>
 	 * </ol>
 	 */
-	UNEXPECTED_END_TOKEN_FOUND("Unexpected end token: '%c'\n"
-			+ "Could not find corresponding open token.\n"
-			+ "%s"),
+	UNEXPECTED_END_TOKEN_FOUND("Unexpected end token: '%c'\n" + "Could not find corresponding open token.\n" + "%s"),
 
 	/**
 	 * Formatter string contains the following place holder(s) specifying:<br>
 	 * <ol>
 	 * <li>%c: expected end token</li>
 	 * <li>%c: actual end token</li>
-	 * <li>%s: (concatenated, initialExpression and trimmedExpression) input string(s) supplied with carets to point to positions of interest</li>
+	 * <li>%s: (concatenated, initialExpression and trimmedExpression) input
+	 * string(s) supplied with carets to point to positions of interest</li>
 	 * </ol>
 	 */
 	EXPRESSION_NOT_PROPERLY_CLOSED("Wrong end token. Expected: %c Actual: %c\n%s"),
@@ -54,7 +57,8 @@ public enum ErrorMessages {
 	 * Formatter string contains the following place holder(s) specifying:<br>
 	 * <ol>
 	 * <li>%s: expected end token(s)</li>
-	 * <li>%s: (concatenated, initialExpression and trimmedExpression) input string(s) supplied with carets to point to positions of interest</li>
+	 * <li>%s: (concatenated, initialExpression and trimmedExpression) input
+	 * string(s) supplied with carets to point to positions of interest</li>
 	 * </ol>
 	 */
 	UNCLOSED_EXPRESSIONS("Missing end token(s). Expected: %s at end of the expression\n%s"),
@@ -65,14 +69,11 @@ public enum ErrorMessages {
 	 * <li>%s: input string which could not be transformed into a number</li>
 	 * </ol>
 	 */
-	NOT_A_NUMBER(
-			"The string '%s' can not be interpreted as a number.\n"
-					+ "Please do not use redundant '+' signs\n"
-					+ "Please do not use multiple '-' signs\n"
-					+ "Please do not use redundant leading/trailing zero's in integer and fractional parts\n"
-					+ "Please enclose repeating fractional parts within curly braces ans append with character 'R'\n"
-					+ "If using the scientific number notation please remind the following:\n"
-					+ "The absolute value of the mantissa should be smaller than 10 and not be smaller than one"),
+	NOT_A_NUMBER("The string '%s' can not be interpreted as a number.\n" + "Please do not use redundant '+' signs\n" + "Please do not use multiple '-' signs\n"
+			+ "Please do not use redundant leading/trailing zero's in integer and fractional parts\n"
+			+ "Please enclose repeating fractional parts within curly braces ans append with character 'R'\n"
+			+ "If using the scientific number notation please remind the following:\n"
+			+ "The absolute value of the mantissa should be smaller than 10 and not be smaller than one"),
 
 	/**
 	 * Formatter string contains the following place holder(s) specifying:<br>
@@ -82,8 +83,7 @@ public enum ErrorMessages {
 	 * <li>%d: type of arguments</li>
 	 * </ol>
 	 */
-	UNKNOWN_METHOD(
-			"The method with alias %s and %d argument(s) of type %s can not be found"),
+	UNKNOWN_METHOD("The method with alias %s and %d argument(s) of type %s can not be found"),
 
 	/**
 	 * Formatter string contains the following place holder(s) specifying:<br>
@@ -93,8 +93,7 @@ public enum ErrorMessages {
 	 * <li>%d: method name</li>
 	 * </ol>
 	 */
-	ANNOTATED_METHOD_NOT_PUBLIC_INSTANCE_METHOD(
-			"The %s annotated %s.%s method is not a public instance method"),
+	ANNOTATED_METHOD_NOT_PUBLIC_INSTANCE_METHOD("The %s annotated %s.%s method is not a public instance method"),
 
 	/**
 	 * Formatter string contains the following place holder(s) specifying:<br>
@@ -103,29 +102,25 @@ public enum ErrorMessages {
 	 * <li>%s: expected return type</li>
 	 * </ol>
 	 */
-	WRONG_METHOD_RETURN_TYPE(
-			"The method's return type class %s is not of type of %s"),
+	WRONG_METHOD_RETURN_TYPE("The method's return type class %s is not of type of %s"),
 
 	/**
 	 * Formatter string contains the following place holder(s) specifying:<br>
 	 * <ol>
-	 * <li>%s: (concatenated, initialExpression and trimmedExpression) input string(s) supplied with carets to point to positions of interest</li>
+	 * <li>%s: (concatenated, initialExpression and trimmedExpression) input
+	 * string(s) supplied with carets to point to positions of interest</li>
 	 * </ol>
 	 */
-	EXPRESSION_CONTAINS_UNFINALIZED_ELEMENTS(
-			"Expression contains unfinalized elements.\n"
-					+ "%s"),
+	EXPRESSION_CONTAINS_UNFINALIZED_ELEMENTS("Expression contains unfinalized elements.\n" + "%s"),
 
 	/**
 	 * Formatter string contains the following place holder(s) specifying:<br>
 	 * <ol>
-	 * <li>%s: (concatenated, initialExpression and trimmedExpression) input string(s) supplied with carets to point to positions of interest</li>
+	 * <li>%s: (concatenated, initialExpression and trimmedExpression) input
+	 * string(s) supplied with carets to point to positions of interest</li>
 	 * </ol>
 	 */
-	EXPRESSION_EXPECTED(
-			"Expression expected but none encountered.\n"
-					+ "The content you provide must result in a number when parsed.\n"
-					+ "%s"),
+	EXPRESSION_EXPECTED("Expression expected but none encountered.\n" + "The content you provide must result in a number when parsed.\n" + "%s"),
 
 	/**
 	 * Formatter string contains the following place holder(s) specifying:<br>
@@ -135,31 +130,26 @@ public enum ErrorMessages {
 	 * <li>
 	 * </ol>
 	 */
-	WRONG_START_POSITION_ADDED_EXPRESSION(
-			"Expression added at wrong position.\n"
-					+ "Expected position: %d.\n"
-					+ "Actual position: %d.\n"),
+	WRONG_START_POSITION_ADDED_EXPRESSION("Expression added at wrong position.\n" + "Expected position: %d.\n" + "Actual position: %d.\n"),
 
 	/**
 	 * Formatter string contains the following place holder(s) specifying:<br>
 	 * <ol>
-	 * <li>%s: (concatenated, initialExpression and trimmedExpression) input string(s) supplied with carets to point to positions of interest</li>
+	 * <li>%s: (concatenated, initialExpression and trimmedExpression) input
+	 * string(s) supplied with carets to point to positions of interest</li>
 	 * </ol>
 	 */
-	EXPRESSION_DOES_NOT_START_WITH_UNARY_OPERATION(
-			"Expression does not start with a unary operation.\n"
-					+ "%s.\n"),
+	EXPRESSION_DOES_NOT_START_WITH_UNARY_OPERATION("Expression does not start with a unary operation.\n" + "%s.\n"),
 
 	/**
 	 * Formatter string contains the following place holder(s) specifying:<br>
 	 * <ol>
 	 * <li>%s: Unexpected content</li>
-	 * <li>%s: (concatenated, initialExpression and trimmedExpression) input string(s) supplied with carets to point to positions of interest</li>
+	 * <li>%s: (concatenated, initialExpression and trimmedExpression) input
+	 * string(s) supplied with carets to point to positions of interest</li>
 	 * </ol>
 	 * */
-	UNEXPECTED_CONTENT_OPERATION(
-			"Unexpected content '%s'.\n"
-					+ "%s.\n"),
+	UNEXPECTED_CONTENT_OPERATION("Unexpected content '%s'.\n" + "%s.\n"),
 
 	/**
 	 * Formatter string contains the following place holder(s) specifying:<br>
@@ -167,10 +157,11 @@ public enum ErrorMessages {
 	 * <li>%s: Method not founf</li>
 	 * </ol>
 	 */
-	METHOD_NOT_FOUND(
-			"No method found to match '%s'");
+	METHOD_NOT_FOUND("No method found to match '%s'");
 
 	private final String format;
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(ErrorMessages.class);
 
 	private ErrorMessages(String format) {
 		this.format = format;
@@ -178,6 +169,27 @@ public enum ErrorMessages {
 
 	public String getFormattedErrorMessage(Object... args) {
 		return "\n" + String.format(format, args);
+	}
+
+	public <T extends RuntimeException> void throwUncheckedException(Class<T> exceptionClazz, Object... args) {
+		String errorMessage = this.getFormattedErrorMessage(args);
+		LOGGER.warn(errorMessage);
+
+		throw getUncheckedException(exceptionClazz, errorMessage);
+	}
+
+	private <T extends RuntimeException> T getUncheckedException(Class<T> exceptionClazz, String errorMessage) {
+
+		Constructor<T> constructor = null;
+		try {
+			constructor = exceptionClazz.getConstructor(new Class<?>[] { String.class });
+			return constructor.newInstance(errorMessage);
+
+		} catch (IllegalArgumentException | NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException
+				| InvocationTargetException e) {
+			throw new IllegalStateException(e);
+		}
+
 	}
 
 }

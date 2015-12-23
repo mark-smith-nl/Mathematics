@@ -1,10 +1,12 @@
 package nl.smith.mathematics.factory;
 
+import static nl.smith.mathematics.utility.ErrorMessages.EXPRESSION_EXPECTED;
+import static nl.smith.mathematics.utility.ErrorMessages.EXPRESSION_NOT_PROPERLY_CLOSED;
+import static nl.smith.mathematics.utility.ErrorMessages.IMPLEMENT_ERROR_MESSAGE;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import nl.smith.mathematics.utility.ErrorMessages;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,12 +14,17 @@ import org.slf4j.LoggerFactory;
 /**
  * Class for storing one or multiple {@link Expression}s.<br>
  * The classes MultiDimensionalExpression and {@link Expression} are intertwined<br>
- * A multidimensional expression has a start position and <b>not null</b> begin and expected end characters.<br>
- * Expressions can only be added to the multidimensional expression if they are finalized and thus valid (see {@link AbstractExpression.STATE}.<br>
+ * A multidimensional expression has a start position and <b>not null</b> begin
+ * and expected end characters.<br>
+ * Expressions can only be added to the multidimensional expression if they are
+ * finalized and thus valid (see {@link AbstractExpression.STATE}.<br>
  * Multidimensional expression can only be finalized if they are valid.<br>
- * They are valid if the expected end character is the actual end character and the multidimensional expression contains at least one expression.<br>
- * The state of a multidimensional expression can only be modified if it is not in the finalized state.<br>
- * Properties can only be retrieved if the multidimensional expression's properties are stable.<br>
+ * They are valid if the expected end character is the actual end character and
+ * the multidimensional expression contains at least one expression.<br>
+ * The state of a multidimensional expression can only be modified if it is not
+ * in the finalized state.<br>
+ * Properties can only be retrieved if the multidimensional expression's
+ * properties are stable.<br>
  * 
  * @author Mark Smith
  *
@@ -40,7 +47,8 @@ public class MultiDimensionalExpression extends AbstractExpression {
 	private final List<Expression> expressions = new ArrayList<>();
 
 	/**
-	 * Constructor for the multidimensional expression starting with a aggregation open token (see {@link ArithmeticExpressionFactoryTest})
+	 * Constructor for the multidimensional expression starting with a
+	 * aggregation open token (see {@link ArithmeticExpressionFactoryTest})
 	 * 
 	 * @param startPosition
 	 * @param startToken
@@ -51,7 +59,7 @@ public class MultiDimensionalExpression extends AbstractExpression {
 		super(expressionStringAggregate, startPosition);
 
 		if (startToken == null || expectedEndToken == null) {
-			throw new IllegalArgumentException(ErrorMessages.IMPLEMENT_ERROR_MESSAGE.getFormattedErrorMessage("No startToken or expectedEndToken supplied"));
+			IMPLEMENT_ERROR_MESSAGE.throwUncheckedException(IllegalArgumentException.class, "No startToken or expectedEndToken supplied");
 		}
 
 		this.startToken = startToken;
@@ -87,19 +95,23 @@ public class MultiDimensionalExpression extends AbstractExpression {
 		this.endToken = endToken;
 		shiftAppendPositionIfValid(1);
 
-		LOGGER.debug("Stopped appending multidimensional expression position({}-...) using tokens '{} 'and '{}'", new Object[] { getStartPosition(), startToken, endToken });
+		LOGGER.debug("Stopped appending multidimensional expression position({}-...) using tokens '{} 'and '{}'", new Object[] { getStartPosition(),
+				startToken, endToken });
 
 		if (endToken != expectedEndToken) {
-			throw new IllegalArgumentException(ErrorMessages.EXPRESSION_NOT_PROPERLY_CLOSED.getFormattedErrorMessage(
+			EXPRESSION_NOT_PROPERLY_CLOSED.throwUncheckedException(
+					IllegalArgumentException.class,
 					expectedEndToken,
 					endToken,
-					getExpressionStringAggregate().getCaretedStringForPositions(ExpressionStringAggregate.ShowCaretString.IN_BOTH_EXPRESSIONS, true, getStartPosition(),
-							getEndPosition())));
+					getExpressionStringAggregate().getCaretedStringForPositions(ExpressionStringAggregate.ShowCaretString.IN_BOTH_EXPRESSIONS, true,
+							getStartPosition(), getEndPosition()));
 		}
 
 		if (expressions.isEmpty()) {
-			throw new IllegalArgumentException(ErrorMessages.EXPRESSION_EXPECTED.getFormattedErrorMessage(
-					getExpressionStringAggregate().getCaretedStringForPositions(ExpressionStringAggregate.ShowCaretString.IN_BOTH_EXPRESSIONS, true, getEndPosition() + 1)));
+			EXPRESSION_EXPECTED.throwUncheckedException(
+					IllegalArgumentException.class,
+					getExpressionStringAggregate().getCaretedStringForPositions(ExpressionStringAggregate.ShowCaretString.IN_BOTH_EXPRESSIONS, true,
+							getEndPosition() + 1));
 		}
 
 		finalize();

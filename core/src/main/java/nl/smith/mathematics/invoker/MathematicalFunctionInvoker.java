@@ -1,5 +1,10 @@
 package nl.smith.mathematics.invoker;
 
+import static nl.smith.mathematics.utility.ErrorMessages.ANNOTATED_METHOD_NOT_PUBLIC_INSTANCE_METHOD;
+import static nl.smith.mathematics.utility.ErrorMessages.IMPLEMENT_ERROR_MESSAGE;
+import static nl.smith.mathematics.utility.ErrorMessages.UNKNOWN_METHOD;
+import static nl.smith.mathematics.utility.ErrorMessages.WRONG_METHOD_RETURN_TYPE;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -26,7 +31,6 @@ import nl.smith.mathematics.functions.AbstractFunction;
 import nl.smith.mathematics.functions.annotation.MathematicalFunction;
 import nl.smith.mathematics.functions.annotation.MathematicalFunctionContainer;
 import nl.smith.mathematics.number.NumberOperations;
-import nl.smith.mathematics.utility.ErrorMessages;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -102,8 +106,7 @@ public class MathematicalFunctionInvoker {
 		Method method = availableMethodAliasMap.get(new SimpleEntry<String, Integer>(methodAlias, numberOfArguments));
 		if (method == null) {
 			Class<?> typeOfArgument = NumberOperations.class;
-			throw new IllegalStateException(ErrorMessages.UNKNOWN_METHOD.getFormattedErrorMessage(methodAlias, numberOfArguments,
-					typeOfArgument.getCanonicalName()));
+			UNKNOWN_METHOD.throwUncheckedException(IllegalStateException.class, methodAlias, numberOfArguments, typeOfArgument.getCanonicalName());
 		}
 		Object proxy = proxies.get(method.getDeclaringClass());
 
@@ -273,8 +276,8 @@ public class MathematicalFunctionInvoker {
 		// Check the method's signature
 		LOGGER.info("Validating if the method {}.{} is a public instance method", method.getDeclaringClass().getCanonicalName(), method.getName());
 		if (Modifier.isPrivate(method.getModifiers()) || Modifier.isStatic(method.getModifiers())) {
-			throw new IllegalStateException(ErrorMessages.ANNOTATED_METHOD_NOT_PUBLIC_INSTANCE_METHOD.getFormattedErrorMessage(
-					MathematicalFunction.class.getCanonicalName(), method.getDeclaringClass().getCanonicalName(), method.getName()));
+			ANNOTATED_METHOD_NOT_PUBLIC_INSTANCE_METHOD.throwUncheckedException(IllegalStateException.class,
+					MathematicalFunction.class.getCanonicalName(), method.getDeclaringClass().getCanonicalName(), method.getName());
 		}
 
 		// Check the method's return type
@@ -282,8 +285,8 @@ public class MathematicalFunctionInvoker {
 				numberClass.getCanonicalName() });
 		Class<?> actualReturnType = method.getReturnType();
 		if (numberClass != actualReturnType) {
-			throw new IllegalStateException(ErrorMessages.WRONG_METHOD_RETURN_TYPE.getFormattedErrorMessage(actualReturnType.getCanonicalName(),
-					numberClass.getCanonicalName()));
+			WRONG_METHOD_RETURN_TYPE.throwUncheckedException(IllegalStateException.class, actualReturnType.getCanonicalName(),
+					numberClass.getCanonicalName());
 		}
 
 		// Check method's argument types
@@ -291,7 +294,7 @@ public class MathematicalFunctionInvoker {
 				new String[] { method.getDeclaringClass().getCanonicalName(), method.getName(), numberClass.getCanonicalName() });
 		Type[] genericParameterTypes = method.getGenericParameterTypes();
 		if (genericParameterTypes.length == 0) {
-			throw new IllegalStateException(ErrorMessages.IMPLEMENT_ERROR_MESSAGE.getFormattedErrorMessage("Geen argumenten"));
+			IMPLEMENT_ERROR_MESSAGE.throwUncheckedException(IllegalStateException.class, "Geen argumenten");
 		}
 
 		for (Type genericParameterType : genericParameterTypes) {
@@ -302,14 +305,14 @@ public class MathematicalFunctionInvoker {
 			} else if (genericParameterType instanceof ParameterizedType) {
 				ParameterizedType parameterizedType = (ParameterizedType) genericParameterType;
 				if (!Collection.class.isAssignableFrom((Class<?>) parameterizedType.getRawType())) {
-					throw new IllegalStateException(ErrorMessages.IMPLEMENT_ERROR_MESSAGE.getFormattedErrorMessage("Wrong generic type"));
+					IMPLEMENT_ERROR_MESSAGE.throwUncheckedException(IllegalStateException.class, "Wrong generic type");
 				}
 
 				actualParameterType = (Class<?>) parameterizedType.getActualTypeArguments()[0];
 			}
 
 			if (numberClass != actualParameterType) {
-				throw new IllegalStateException(ErrorMessages.IMPLEMENT_ERROR_MESSAGE.getFormattedErrorMessage("Wrong number"));
+				IMPLEMENT_ERROR_MESSAGE.throwUncheckedException(IllegalStateException.class, "Wrong number");
 			}
 		}
 

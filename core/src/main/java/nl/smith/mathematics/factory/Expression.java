@@ -1,9 +1,9 @@
 package nl.smith.mathematics.factory;
 
+import static nl.smith.mathematics.utility.ErrorMessages.IMPLEMENT_ERROR_MESSAGE;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import nl.smith.mathematics.utility.ErrorMessages;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -12,14 +12,16 @@ import org.slf4j.LoggerFactory;
 /**
  * Class for storing characters for generating an arithmetic expression.<br>
  * The classes Expression and {@link MultiDimensionalExpression} are intertwined<br>
- * Multidimensional expressions can only be added to the expression if they are finalized and thus valid (see {@link AbstractExpression.STATE}.<br>
+ * Multidimensional expressions can only be added to the expression if they are
+ * finalized and thus valid (see {@link AbstractExpression.STATE}.<br>
  * Expressions can only be instantiated with
  * <ul>
  * <li>real content (not expression place holders) or</li>
  * <li><strike>a multidimensional expressions with dimension 1</strike><br>
  * </ul>
  * <br>
- * The state of a multidimensional expression can only be modified if it is not in the finalized state.<br>
+ * The state of a multidimensional expression can only be modified if it is not
+ * in the finalized state.<br>
  * 
  * @author Mark Smith
  *
@@ -56,7 +58,8 @@ public class Expression extends AbstractExpression {
 	}
 
 	/**
-	 * Validates that the expression is a not null one dimensional expression and if so returns its start position
+	 * Validates that the expression is a not null one dimensional expression
+	 * and if so returns its start position
 	 * 
 	 * @param multiDimensionalExpression
 	 * @return the start position of the provided multiDimensionalExpression
@@ -73,7 +76,7 @@ public class Expression extends AbstractExpression {
 		validateInState(STATE.BUILD);
 
 		if (StringUtils.isBlank(content)) {
-			throw new IllegalArgumentException(ErrorMessages.IMPLEMENT_ERROR_MESSAGE.getFormattedErrorMessage("No content specified"));
+			IMPLEMENT_ERROR_MESSAGE.throwUncheckedException(IllegalArgumentException.class, "No content specified");
 		}
 
 		shiftAppendPositionIfValid(content.length());
@@ -97,7 +100,10 @@ public class Expression extends AbstractExpression {
 		multiDimensionalExpressions.add(multiDimensionalExpression);
 	}
 
-	/** Returns the content of an expression using <b>$</b> as place holders for compound expressions */
+	/**
+	 * Returns the content of an expression using <b>$</b> as place holders for
+	 * compound expressions
+	 */
 	public String getContentAsString() {
 		return content.toString();
 	}
@@ -111,12 +117,13 @@ public class Expression extends AbstractExpression {
 	 */
 	public int getRealPosition(int relativePosition) {
 		if (relativePosition < 0 || relativePosition >= content.length()) {
-			throw new IllegalArgumentException(ErrorMessages.IMPLEMENT_ERROR_MESSAGE.getFormattedErrorMessage(""));
+			IMPLEMENT_ERROR_MESSAGE.throwUncheckedException(IllegalArgumentException.class, "");
 		}
 
 		int realPosition = getStartPosition() + relativePosition;
 
-		int numberOfMultiDimensionalExpressions = StringUtils.countMatches(content.subSequence(0, relativePosition).toString(), String.valueOf(EXPRESSION_PLACE_HOLDER));
+		int numberOfMultiDimensionalExpressions = StringUtils.countMatches(content.subSequence(0, relativePosition).toString(),
+				String.valueOf(EXPRESSION_PLACE_HOLDER));
 		for (int i = 0; i < numberOfMultiDimensionalExpressions; i++) {
 			realPosition += multiDimensionalExpressions.get(i).getLength();
 		}

@@ -1,6 +1,6 @@
 package nl.smith.mathematics.factory;
 
-import nl.smith.mathematics.utility.ErrorMessages;
+import static nl.smith.mathematics.utility.ErrorMessages.IMPLEMENT_ERROR_MESSAGE;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -28,13 +28,13 @@ public abstract class AbstractExpression {
 	public AbstractExpression(ExpressionStringAggregate expressionStringAggregate, int startPosition) {
 
 		if (expressionStringAggregate == null) {
-			throw new IllegalArgumentException(ErrorMessages.IMPLEMENT_ERROR_MESSAGE.getFormattedErrorMessage("No ExpressionStringAggregate supplied"));
+			IMPLEMENT_ERROR_MESSAGE.throwUncheckedException(IllegalArgumentException.class, "No ExpressionStringAggregate supplied");
 		}
 
 		lastPositionTrimmedExpression = expressionStringAggregate.getTrimmedExpression().length() - 1;
 
 		if (startPosition < 0 || startPosition > lastPositionTrimmedExpression) {
-			throw new IllegalArgumentException(ErrorMessages.IMPLEMENT_ERROR_MESSAGE.getFormattedErrorMessage("Foute startpositie 1"));
+			IMPLEMENT_ERROR_MESSAGE.throwUncheckedException(IllegalArgumentException.class, "Foute startpositie 1");
 		}
 
 		this.expressionStringAggregate = expressionStringAggregate;
@@ -58,7 +58,8 @@ public abstract class AbstractExpression {
 				return;
 		}
 
-		throw new IllegalStateException(String.format("\nThe multidimensional expression is not in one the specified state\nExpected in one of the states: %s\nActual: %s",
+		throw new IllegalStateException(String.format(
+				"\nThe multidimensional expression is not in one the specified state\nExpected in one of the states: %s\nActual: %s",
 				StringUtils.join(states, ", "), this.state));
 
 	}
@@ -84,7 +85,7 @@ public abstract class AbstractExpression {
 	 */
 	public void shiftAppendPositionIfValid(AbstractExpression augend) {
 		if (augend.getStartPosition() != appendPosition) {
-			throw new IllegalArgumentException(ErrorMessages.IMPLEMENT_ERROR_MESSAGE.getFormattedErrorMessage("Content starts ar wrong position"));
+			IMPLEMENT_ERROR_MESSAGE.throwUncheckedException(IllegalArgumentException.class, "Content starts ar wrong position");
 		}
 
 		shiftAppendPositionIfValid(augend.getLength());
@@ -93,7 +94,8 @@ public abstract class AbstractExpression {
 	public void shiftAppendPositionIfValid(int length) {
 		appendPosition += length;
 		if (appendPosition > lastPositionTrimmedExpression + 1) {
-			throw new IllegalArgumentException(ErrorMessages.IMPLEMENT_ERROR_MESSAGE.getFormattedErrorMessage("Content size exceeds the size of the original raw expression"));
+			IMPLEMENT_ERROR_MESSAGE.throwUncheckedException(IllegalArgumentException.class,
+					"Content size exceeds the size of the original raw expression");
 		}
 	}
 
@@ -101,7 +103,10 @@ public abstract class AbstractExpression {
 		return expressionStringAggregate;
 	}
 
-	/** Returns the begin position of the expression relative to the trimmed root expression */
+	/**
+	 * Returns the begin position of the expression relative to the trimmed root
+	 * expression
+	 */
 	public int getStartPosition() {
 		return startPosition;
 	}
