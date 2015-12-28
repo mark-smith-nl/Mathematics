@@ -50,7 +50,7 @@ public enum ErrorMessages {
 	 * <li>%s: method argument(s)</li>
 	 * </ol>
 	 */
-	REQUIRED_METHOD_NOT_RETRIEVED("Method %s %s %s.(%s)' not found"),
+	REQUIRED_METHOD_NOT_RETRIEVED("Method %s %s %s.%s(%s)' not found"),
 
 	/**
 	 * Formatter string contains the following place holder(s) specifying:<br>
@@ -68,7 +68,7 @@ public enum ErrorMessages {
 	 * <li>%s: class of instance to be constructed during parsing of the string</li>
 	 * </ol>
 	 */
-	STRING_NUMBER_PARSE_ERROR("Can not parse the string value %s into an instance of type %s"),
+	STRING_NUMBER_PARSE_ERROR("Can not parse the string value '%s' into an instance of type %s"),
 
 	/**
 	 * Formatter string contains the following place holder(s) specifying:<br>

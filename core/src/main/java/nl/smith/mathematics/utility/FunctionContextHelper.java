@@ -29,6 +29,7 @@ import nl.smith.mathematics.number.NumberOperations;
 import org.apache.commons.lang.IllegalClassException;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
@@ -67,10 +68,10 @@ public class FunctionContextHelper {
 	private static final String REGEX_DATE = "[0-3]\\d\\-[0-1]\\d-\\d{4}";
 	private static final String REGEX_DATE_TIME = REGEX_DATE + " [0-2]\\d:[0-5]\\d:[0-5]\\d";
 
-	private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormat.forPattern("dd-MM-yyyy");
+	public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormat.forPattern("dd-MM-yyyy");
 	private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormat.forPattern("dd-MM-yyyy HH:mm:ss");
 
-	private static final String NUMBER_FACTORY_METHOD_NAME = "valueOf";
+	public static final String NUMBER_FACTORY_METHOD_NAME = "valueOf";
 
 	private static final Map<Class<? extends NumberOperations<?>>, Method> NUMBER_FACTORY_METHODS = new HashMap<>();
 
@@ -196,13 +197,22 @@ public class FunctionContextHelper {
 			} else if (Pattern.matches(REGEX_DATE_TIME, propertyStringValue)) {
 				dtf = DATE_TIME_FORMATTER;
 			} else {
+				// TODO Error message
 				System.out.println("Fout");
 			}
 
 			instance = (T) dtf.parseDateTime(propertyStringValue);
-		}
+		} else if (propertyType.equals(LocalDate.class)) {
+			DateTimeFormatter dtf = null;
+			if (Pattern.matches(REGEX_DATE, propertyStringValue)) {
+				dtf = DATE_FORMATTER;
+			} else {
+				// TODO Error message
+				System.out.println("Fout");
+			}
 
-		else if (NumberOperations.class.isAssignableFrom(propertyType)) {
+			instance = (T) dtf.parseLocalDate(propertyStringValue);
+		} else if (NumberOperations.class.isAssignableFrom(propertyType)) {
 			Class<NumberOperations<?>> clazz = (Class<NumberOperations<?>>) propertyType;
 			Method numberFactory = getNumberFactoryMethod(clazz);
 
@@ -231,7 +241,7 @@ public class FunctionContextHelper {
 				}
 			} catch (NoSuchMethodException | SecurityException e) {
 				REQUIRED_METHOD_NOT_RETRIEVED.throwUncheckedException(IllegalStateException.class, e, "public static", clazz.getCanonicalName(), clazz.getCanonicalName(),
-						NUMBER_FACTORY_METHOD_NAME, String.class);
+						NUMBER_FACTORY_METHOD_NAME, String.class.getCanonicalName());
 			}
 			NUMBER_FACTORY_METHODS.put(clazz, numberFactoryMethod);
 		}
@@ -245,6 +255,7 @@ public class FunctionContextHelper {
 		if (constructorWithStringArgument == null) {
 			try {
 				constructorWithStringArgument = clazz.getConstructor(String.class);
+				constructorsWithStringArgument.put(clazz, constructorWithStringArgument);
 			} catch (NoSuchMethodException | SecurityException e) {
 				REQUIRED_CONSTRUCTOR_NOT_RETRIEVED.throwUncheckedException(IllegalArgumentException.class, e, clazz.getCanonicalName(), String.class.getCanonicalName());
 			}
