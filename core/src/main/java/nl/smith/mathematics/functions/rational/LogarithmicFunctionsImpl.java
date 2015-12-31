@@ -5,6 +5,7 @@ import static java.math.BigInteger.ONE;
 import java.math.BigInteger;
 
 import nl.smith.mathematics.functions.LogarithmicFunctions;
+import nl.smith.mathematics.functions.annotation.FunctionProperty;
 import nl.smith.mathematics.functions.annotation.MathematicalFunction;
 import nl.smith.mathematics.number.RationalNumber;
 
@@ -18,14 +19,15 @@ public class LogarithmicFunctionsImpl extends LogarithmicFunctions<RationalNumbe
 	@SuppressWarnings("unused")
 	private static final Logger LOGGER = LoggerFactory.getLogger(LogarithmicFunctionsImpl.class);
 
-	private final BigInteger taylorNumber;
+	@FunctionProperty
+	private BigInteger taylorNumber;
 
-	private final RationalNumber eulersNumber;
+	@FunctionProperty
+	private RationalNumber eulersNumber;
 
 	/** Spring instantiated bean */
 	public LogarithmicFunctionsImpl() {
-		taylorNumber = (BigInteger) getFunctionContext().get("taylorNumber");
-		eulersNumber = (RationalNumber) getFunctionContext().get("eulersNumber");
+
 	}
 
 	// Constructor for instantiating proxy
@@ -40,9 +42,7 @@ public class LogarithmicFunctionsImpl extends LogarithmicFunctions<RationalNumbe
 	}
 
 	/**
-	 * exp(x) = 1 + x/1! + x^2/2! + x^3/3! + x^4/4! ...
-	 * T(i) = x*T(i-1)/i
-	 * T(0) = 1
+	 * exp(x) = 1 + x/1! + x^2/2! + x^3/3! + x^4/4! ... T(i) = x*T(i-1)/i T(0) = 1
 	 */
 	@Override
 	@MathematicalFunction

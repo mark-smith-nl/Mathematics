@@ -382,6 +382,19 @@ public class FunctionContextHelperTest {
 
 	}
 
+	@Test
+	public void makeFunctionContextWithPropertyFileWithSystemProperty() {
+		Class<? extends AbstractFunction> clazz = AnotherTestFunction.class;
+
+		System.setProperty("myGender", "FEMALE");
+		Map<String, Object> functionContext = FunctionContextHelper.makeFunctionContext(clazz);
+		assertEquals(3, functionContext.size());
+		assertEquals("Mark Smith", functionContext.get("myName"));
+		assertEquals(SEXE.FEMALE, functionContext.get("myGender"));
+		assertEquals(new LocalDate(1965, 7, 28), functionContext.get("myBirthDate"));
+
+	}
+
 	private static <T extends RuntimeException> void checkExceptionAndRethrow(T e, Class<? extends RuntimeException> clazz, String formattedErrorMessage) throws T {
 		checkExceptionAndRethrow(e, clazz, null, formattedErrorMessage);
 	}

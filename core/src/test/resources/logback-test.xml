@@ -1,5 +1,5 @@
-<configuration debug="false">
-
+<!-- Set debug to false to hide logback initialization info -->
+<configuration debug="true">
 	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
 		<encoder>
 			<pattern>%d{HH:mm:ss.SSS} %-5level %logger{64}:%L\n%msg%n</pattern>

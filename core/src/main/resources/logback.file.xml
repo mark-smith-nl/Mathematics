@@ -1,3 +1,4 @@
+<!-- Set debug to false to hide logback initialization info -->
 <configuration debug="false">
 	<appender name="FILE" class="ch.qos.logback.core.FileAppender">
 		<file>${java.io.tmpdir}/mathematics.log</file>

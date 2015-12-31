@@ -4,6 +4,7 @@ import java.math.BigInteger;
 
 import nl.smith.mathematics.functions.AngleType;
 import nl.smith.mathematics.functions.GoniometricFunctions;
+import nl.smith.mathematics.functions.annotation.FunctionProperty;
 import nl.smith.mathematics.number.DecimalNumber;
 
 import org.slf4j.Logger;
@@ -15,17 +16,18 @@ public class GoniometricFunctionsImpl extends GoniometricFunctions<DecimalNumber
 	@SuppressWarnings("unused")
 	private static final Logger LOGGER = LoggerFactory.getLogger(GoniometricFunctionsImpl.class);
 
-	private final BigInteger taylorNumber;
+	@FunctionProperty
+	private BigInteger taylorNumber;
 
-	private final AngleType angleType;
+	@FunctionProperty
+	private AngleType angleType;
 
-	private final DecimalNumber pi;
+	@FunctionProperty
+	private DecimalNumber pi;
 
 	/** Spring instantiated bean */
 	public GoniometricFunctionsImpl() {
-		taylorNumber = (BigInteger) getFunctionContext().get("taylorNumber");
-		angleType = (AngleType) getFunctionContext().get("angleType");
-		pi = (DecimalNumber) getFunctionContext().get("PI");
+
 	}
 
 	// Constructor for instantiating proxy

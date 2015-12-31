@@ -7,6 +7,7 @@ import java.math.BigInteger;
 
 import nl.smith.mathematics.functions.AngleType;
 import nl.smith.mathematics.functions.GoniometricFunctions;
+import nl.smith.mathematics.functions.annotation.FunctionProperty;
 import nl.smith.mathematics.functions.annotation.MathematicalFunction;
 import nl.smith.mathematics.number.RationalNumber;
 
@@ -24,24 +25,25 @@ public class GoniometricFunctionsImpl extends GoniometricFunctions<RationalNumbe
 
 	private static final BigInteger FOUR = BigInteger.valueOf(4);
 
-	private final BigInteger taylorNumber;
+	@FunctionProperty(simplePropertyName = "taylorNumber", prefixWithCanonicalClassName = false)
+	private BigInteger taylorNumber;
 
-	private final AngleType angleType;
+	@FunctionProperty
+	private AngleType angleType;
 
-	private final RationalNumber pi;
+	@FunctionProperty
+	private RationalNumber pi;
 
 	/** Spring instantiated bean */
 	public GoniometricFunctionsImpl() {
-		taylorNumber = (BigInteger) getFunctionContext().get("taylorNumber");
-		angleType = (AngleType) getFunctionContext().get("angleType");
-		pi = (RationalNumber) getFunctionContext().get("PI");
+
 	}
 
 	// Constructor for instantiating proxy
 	public GoniometricFunctionsImpl(GoniometricFunctionsImpl goniometricFunctionsImpl) {
 		taylorNumber = goniometricFunctionsImpl.taylorNumber;
 		angleType = goniometricFunctionsImpl.angleType;
-		pi = goniometricFunctionsImpl.pi;
+		// pi = goniometricFunctionsImpl.pi;
 	}
 
 	public BigInteger getTaylorNumber() {
@@ -81,8 +83,7 @@ public class GoniometricFunctionsImpl extends GoniometricFunctions<RationalNumbe
 	}
 
 	/**
-	 * Taylor series: Sin(x) = 0 + x - x^3/3! + x^5/5! - x^7/7! + ... Sum(T(i))
-	 * T(0) = x T(i) = -x^2/((2i +1)* 2i)
+	 * Taylor series: Sin(x) = 0 + x - x^3/3! + x^5/5! - x^7/7! + ... Sum(T(i)) T(0) = x T(i) = -x^2/((2i +1)* 2i)
 	 */
 	@Override
 	@MathematicalFunction(methodNameAlias = "sin")
