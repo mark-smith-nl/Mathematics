@@ -8,8 +8,9 @@ import nl.smith.mathematics.number.DecimalNumber;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
-//@Component
+@Component
 public class LogarithmicFunctionsImpl extends LogarithmicFunctions<DecimalNumber> {
 
 	@SuppressWarnings("unused")
@@ -23,13 +24,12 @@ public class LogarithmicFunctionsImpl extends LogarithmicFunctions<DecimalNumber
 
 	/** Spring instantiated bean */
 	public LogarithmicFunctionsImpl() {
-
+		super();
 	}
 
 	// Constructor for instantiating proxy
-	public LogarithmicFunctionsImpl(LogarithmicFunctionsImpl logarithmicFunctionsImpl) {
-		taylorNumber = logarithmicFunctionsImpl.taylorNumber;
-		eulersNumber = logarithmicFunctionsImpl.eulersNumber;
+	public LogarithmicFunctionsImpl(LogarithmicFunctionsImpl baseObject) {
+		super(baseObject);
 	}
 
 	public BigInteger getTaylorNumber() {
@@ -52,5 +52,10 @@ public class LogarithmicFunctionsImpl extends LogarithmicFunctions<DecimalNumber
 	public DecimalNumber ln(DecimalNumber number) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public String toString() {
+		return "LogarithmicFunctionsImpl [taylorNumber=" + taylorNumber + ", eulersNumber=" + eulersNumber + "]";
 	}
 }

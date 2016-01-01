@@ -24,12 +24,12 @@ public class SimpleArithmeticFunctionsImpl extends SimpleArithmeticFunctions<Dec
 
 	/** Spring instantiated bean */
 	public SimpleArithmeticFunctionsImpl() {
-
+		super();
 	}
 
 	// Constructor for instantiating proxy
-	public SimpleArithmeticFunctionsImpl(SimpleArithmeticFunctionsImpl simpleArithmeticFunctionsImpl) {
-		// No values are being transferred to the proxy
+	public SimpleArithmeticFunctionsImpl(SimpleArithmeticFunctionsImpl baseObject) {
+		super(baseObject);
 	}
 
 	@Override
@@ -75,5 +75,10 @@ public class SimpleArithmeticFunctionsImpl extends SimpleArithmeticFunctions<Dec
 		}
 
 		return new DecimalNumber(product);
+	}
+
+	@Override
+	public String toString() {
+		return "SimpleArithmeticFunctionsImpl []";
 	}
 }

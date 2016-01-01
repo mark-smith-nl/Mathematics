@@ -17,16 +17,17 @@ public class StatisticalFunctionsImpl extends StatisticalFunctions<DecimalNumber
 	@SuppressWarnings("unused")
 	private static final Logger LOGGER = LoggerFactory.getLogger(StatisticalFunctionsImpl.class);
 
-	private final SimpleArithmeticFunctionsImpl simpleArithmeticFunctionsImpl;
+	private SimpleArithmeticFunctionsImpl simpleArithmeticFunctionsImpl;
 
 	/** Spring instantiated bean */
 	public StatisticalFunctionsImpl(SimpleArithmeticFunctionsImpl simpleArithmeticFunctionsImpl) {
+		super();
 		this.simpleArithmeticFunctionsImpl = simpleArithmeticFunctionsImpl;
 	}
 
 	// Constructor for instantiating proxy
-	public StatisticalFunctionsImpl(StatisticalFunctionsImpl statisticalFunctionsImpl) {
-		simpleArithmeticFunctionsImpl = statisticalFunctionsImpl.simpleArithmeticFunctionsImpl;
+	public StatisticalFunctionsImpl(StatisticalFunctionsImpl baseObject) {
+		super(baseObject);
 	}
 
 	@Override
@@ -54,6 +55,11 @@ public class StatisticalFunctionsImpl extends StatisticalFunctions<DecimalNumber
 		}
 
 		return sum.divide(BigInteger.valueOf(numbers.length));
+	}
+
+	@Override
+	public String toString() {
+		return "StatisticalFunctionsImpl [simpleArithmeticFunctionsImpl=" + simpleArithmeticFunctionsImpl.toString() + "]";
 	}
 
 }

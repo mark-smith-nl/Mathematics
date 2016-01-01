@@ -36,15 +36,12 @@ public class GoniometricFunctionsImpl extends GoniometricFunctions<RationalNumbe
 
 	/** Spring instantiated bean */
 	public GoniometricFunctionsImpl() {
-
+		super();
 	}
 
 	// Constructor for instantiating proxy
-	public GoniometricFunctionsImpl(GoniometricFunctionsImpl goniometricFunctionsImpl) {
-		System.out.println("Yessssssssssssssssssssssssssssssssssssssssssssss");
-		taylorNumber = goniometricFunctionsImpl.taylorNumber;
-		angleType = goniometricFunctionsImpl.angleType;
-		// pi = goniometricFunctionsImpl.pi;
+	public GoniometricFunctionsImpl(GoniometricFunctionsImpl baseObject) {
+		super(baseObject);
 	}
 
 	public BigInteger getTaylorNumber() {
@@ -129,6 +126,11 @@ public class GoniometricFunctionsImpl extends GoniometricFunctions<RationalNumbe
 			subtract = !subtract;
 		}
 		return sum;
+	}
+
+	@Override
+	public String toString() {
+		return "GoniometricFunctionsImpl [taylorNumber=" + taylorNumber + ", angleType=" + angleType + ", pi=" + pi + "]";
 	}
 
 }

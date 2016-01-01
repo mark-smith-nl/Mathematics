@@ -22,12 +22,12 @@ public class SimpleArithmeticFunctionsImpl extends SimpleArithmeticFunctions<Rat
 
 	/** Spring instantiated bean */
 	public SimpleArithmeticFunctionsImpl() {
-
+		super();
 	}
 
 	// Constructor for instantiating proxy
-	public SimpleArithmeticFunctionsImpl(SimpleArithmeticFunctionsImpl simpleArithmeticFunctionsImpl) {
-		// No values are being transferred to the proxy
+	public SimpleArithmeticFunctionsImpl(SimpleArithmeticFunctionsImpl baseObject) {
+		super(baseObject);
 	}
 
 	@Override
@@ -76,6 +76,11 @@ public class SimpleArithmeticFunctionsImpl extends SimpleArithmeticFunctions<Rat
 		}
 
 		return new RationalNumber(product);
+	}
+
+	@Override
+	public String toString() {
+		return "SimpleArithmeticFunctionsImpl []";
 	}
 
 }

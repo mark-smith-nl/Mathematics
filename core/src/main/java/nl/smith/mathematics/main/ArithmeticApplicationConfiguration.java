@@ -73,8 +73,8 @@ public class ArithmeticApplicationConfiguration {
 
 				numberClass = (Class<? extends NumberOperations<?>>) clazz;
 			} else {
-				LOGGER.info("No number type specified.\nSpecify number type as System.property ('{}')\nUsing default number type: {}",
-						NUMBER_CLASS_PROPERTY_NAME, DEFAULT_NUMBERT_TYPE_CLASS.getCanonicalName());
+				LOGGER.info("No number type specified.\nSpecify number type as System.property ('{}')\nUsing default number type: {}", NUMBER_CLASS_PROPERTY_NAME,
+						DEFAULT_NUMBERT_TYPE_CLASS.getCanonicalName());
 				numberClass = DEFAULT_NUMBERT_TYPE_CLASS;
 			}
 		} catch (ClassNotFoundException e) {
@@ -146,8 +146,8 @@ public class ArithmeticApplicationConfiguration {
 		println(StringUtils.repeat("-", 80));
 		String methodNameAlias = "Faculteit";
 		println("Testing: " + methodNameAlias);
-		RationalNumber[] rationalNumbers = new RationalNumber[] { new RationalNumber(500, 100), new RationalNumber(5), new RationalNumber(-5),
-				new RationalNumber(101), RationalNumber.valueOf("2.3{456}R") };
+		RationalNumber[] rationalNumbers = new RationalNumber[] { new RationalNumber(500, 100), new RationalNumber(5), new RationalNumber(-5), new RationalNumber(101),
+				RationalNumber.valueOf("2.3{456}R") };
 		for (RationalNumber rationalNumber : rationalNumbers) {
 			try {
 				println("Number argument: " + rationalNumber.toStringExact());
@@ -166,8 +166,7 @@ public class ArithmeticApplicationConfiguration {
 			RationalNumber rationalNumberTwo = new RationalNumber(12, 3);
 			println("Number argument one: " + rationalNumberOne.toStringExact());
 			println("Number argument two: " + rationalNumberTwo.toStringExact());
-			println("Result: "
-					+ ((RationalNumber) mathematicalFunctionInvoker.invoke(methodNameAlias, rationalNumberOne, rationalNumberTwo, "sss")).toStringExact());
+			println("Result: " + ((RationalNumber) mathematicalFunctionInvoker.invoke(methodNameAlias, rationalNumberOne, rationalNumberTwo, "sss")).toStringExact());
 		} catch (IllegalStateException e) {
 			Throwable cause = e;
 			while (cause.getCause() != null) {
@@ -177,6 +176,21 @@ public class ArithmeticApplicationConfiguration {
 		}
 		println(StringUtils.repeat("-", 80));
 
+		println(StringUtils.repeat("-", 80));
+		methodNameAlias = "sin";
+		println("Testing: " + methodNameAlias);
+		try {
+			RationalNumber rationalNumberOne = new RationalNumber(10, 3);
+			println("Number argument one: " + rationalNumberOne.toStringExact());
+			println("Result: " + ((RationalNumber) mathematicalFunctionInvoker.invoke(methodNameAlias, rationalNumberOne)).toStringExact());
+		} catch (IllegalStateException e) {
+			Throwable cause = e;
+			while (cause.getCause() != null) {
+				cause = cause.getCause();
+			}
+			println(cause.getMessage());
+		}
+		println(StringUtils.repeat("-", 80));
 	}
 
 	private static void showLogInfo() {

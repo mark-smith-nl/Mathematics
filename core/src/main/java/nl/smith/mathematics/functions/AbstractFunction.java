@@ -22,13 +22,6 @@ public abstract class AbstractFunction {
 		setFunctionProperties(clazz);
 	}
 
-	// Constructor for instantiating proxy
-	// public<T extends AbstractFunction> AbstractFunction(T baseObject ) {
-	// Class<? extends AbstractFunction> clazz = this.getClass();
-	// LOGGER.info("Create instance proxy instance of class {}", clazz.getCanonicalName());
-	// copyFunctionProperties(clazz);
-	// }
-
 	@SuppressWarnings("unchecked")
 	private void setFunctionProperties(Class<? extends AbstractFunction> clazz) {
 		while (clazz != AbstractFunction.class) {
@@ -87,6 +80,40 @@ public abstract class AbstractFunction {
 					throw new IllegalStateException("Fout", e);
 				}
 			}
+		}
+	}
+
+	// Constructor for instantiating proxy
+	public <T extends AbstractFunction> AbstractFunction(T baseObject) {
+		Class<? extends AbstractFunction> clazz = this.getClass();
+		LOGGER.info("Create instance proxy instance of class {} using {}", clazz.getCanonicalName(), baseObject.toString());
+		copyFunctionProperties(clazz, baseObject);
+	}
+
+	@SuppressWarnings("unchecked")
+	private void copyFunctionProperties(Class<? extends AbstractFunction> clazz, Object baseObject) { // TODO Auto-generated method stub
+		while (clazz != AbstractFunction.class) {
+			Field[] declaredFields = clazz.getDeclaredFields();
+			for (Field field : declaredFields) {
+				int modifiers = field.getModifiers();
+				if (!Modifier.isStatic(modifiers)) {
+					boolean isPublic = Modifier.isPublic(modifiers);
+					if (!isPublic) {
+						field.setAccessible(true);
+					}
+					try {
+						field.set(this, field.get(baseObject));
+					} catch (IllegalArgumentException | IllegalAccessException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					if (!isPublic) {
+						field.setAccessible(false);
+					}
+				}
+
+			}
+			clazz = (Class<? extends AbstractFunction>) clazz.getSuperclass();
 		}
 	}
 

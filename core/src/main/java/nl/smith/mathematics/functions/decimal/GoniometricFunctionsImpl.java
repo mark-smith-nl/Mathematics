@@ -9,8 +9,9 @@ import nl.smith.mathematics.number.DecimalNumber;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
-//@Component
+@Component
 public class GoniometricFunctionsImpl extends GoniometricFunctions<DecimalNumber> {
 
 	@SuppressWarnings("unused")
@@ -27,14 +28,12 @@ public class GoniometricFunctionsImpl extends GoniometricFunctions<DecimalNumber
 
 	/** Spring instantiated bean */
 	public GoniometricFunctionsImpl() {
-
+		super();
 	}
 
 	// Constructor for instantiating proxy
-	public GoniometricFunctionsImpl(GoniometricFunctionsImpl goniometricFunctionsImpl) {
-		taylorNumber = goniometricFunctionsImpl.taylorNumber;
-		angleType = goniometricFunctionsImpl.angleType;
-		pi = goniometricFunctionsImpl.pi;
+	public GoniometricFunctionsImpl(GoniometricFunctionsImpl baseObject) {
+		super(baseObject);
 	}
 
 	public BigInteger getTaylorNumber() {
@@ -69,6 +68,11 @@ public class GoniometricFunctionsImpl extends GoniometricFunctions<DecimalNumber
 	public DecimalNumber cos(DecimalNumber angle) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public String toString() {
+		return "GoniometricFunctionsImpl [taylorNumber=" + taylorNumber + ", angleType=" + angleType + ", pi=" + pi + "]";
 	}
 
 }

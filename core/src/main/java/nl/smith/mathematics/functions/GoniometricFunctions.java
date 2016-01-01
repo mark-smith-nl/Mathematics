@@ -6,6 +6,14 @@ import nl.smith.mathematics.number.NumberOperations;
 @MathematicalFunctionContainer(name = "Goniometric functions", description = "Set of goniometric functions")
 public abstract class GoniometricFunctions<T extends NumberOperations<?>> extends AbstractFunction {
 
+	public GoniometricFunctions() {
+		super();
+	}
+
+	public <F extends GoniometricFunctions<T>> GoniometricFunctions(F baseObject) {
+		super(baseObject);
+	}
+
 	public abstract AngleType getAngleType();
 
 	public abstract T convertAngle(AngleType from, AngleType to);

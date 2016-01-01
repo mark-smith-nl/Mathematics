@@ -15,17 +15,18 @@ import org.springframework.stereotype.Component;
 @Component
 public class StatisticalFunctionsImpl extends StatisticalFunctions<RationalNumber> {
 
-	private final SimpleArithmeticFunctionsImpl simpleArithmeticFunctionsImpl;
+	private SimpleArithmeticFunctionsImpl simpleArithmeticFunctionsImpl;
 
 	/** Spring instantiated bean */
 	@Autowired
 	public StatisticalFunctionsImpl(SimpleArithmeticFunctionsImpl simpleArithmeticFunctionsImpl) {
+		super();
 		this.simpleArithmeticFunctionsImpl = simpleArithmeticFunctionsImpl;
 	}
 
 	// Constructor for instantiating proxy
-	public StatisticalFunctionsImpl(StatisticalFunctionsImpl statisticalFunctionsImpl) {
-		simpleArithmeticFunctionsImpl = statisticalFunctionsImpl.simpleArithmeticFunctionsImpl;
+	public StatisticalFunctionsImpl(StatisticalFunctionsImpl baseObject) {
+		super(baseObject);
 	}
 
 	@Override
@@ -56,6 +57,11 @@ public class StatisticalFunctionsImpl extends StatisticalFunctions<RationalNumbe
 		}
 
 		return sum.divide(BigInteger.valueOf(numbers.length));
+	}
+
+	@Override
+	public String toString() {
+		return "StatisticalFunctionsImpl [simpleArithmeticFunctionsImpl=" + simpleArithmeticFunctionsImpl.toString() + "]";
 	}
 
 }

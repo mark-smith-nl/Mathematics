@@ -27,13 +27,12 @@ public class LogarithmicFunctionsImpl extends LogarithmicFunctions<RationalNumbe
 
 	/** Spring instantiated bean */
 	public LogarithmicFunctionsImpl() {
-
+		super();
 	}
 
 	// Constructor for instantiating proxy
-	public LogarithmicFunctionsImpl(LogarithmicFunctionsImpl logarithmicFunctionsImpl) {
-		taylorNumber = logarithmicFunctionsImpl.taylorNumber;
-		eulersNumber = logarithmicFunctionsImpl.eulersNumber;
+	public LogarithmicFunctionsImpl(LogarithmicFunctionsImpl baseObject) {
+		super(baseObject);
 	}
 
 	@Override
@@ -80,6 +79,17 @@ public class LogarithmicFunctionsImpl extends LogarithmicFunctions<RationalNumbe
 			subtract = !subtract;
 		}
 		return sum;
+	}
+
+	public LogarithmicFunctionsImpl(BigInteger taylorNumber, RationalNumber eulersNumber) {
+		super();
+		this.taylorNumber = taylorNumber;
+		this.eulersNumber = eulersNumber;
+	}
+
+	@Override
+	public String toString() {
+		return "LogarithmicFunctionsImpl [taylorNumber=" + taylorNumber + ", eulersNumber=" + eulersNumber + "]";
 	}
 
 }
