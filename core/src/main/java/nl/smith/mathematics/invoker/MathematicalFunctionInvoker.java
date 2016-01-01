@@ -38,11 +38,8 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Class which is responsible for invoking methods in associated proxy classes.<br>
- * It creates proxies for all beans of type {@link AbstractFunction} provided to
- * the constructor (Spring beans annotated with
- * {@link MathematicalFunctionContainer}).<br>
- * Methods in these beans which are annotated with {@link MethodConstraint} are
- * being intercepted before invocation.
+ * It creates proxies for all beans of type {@link AbstractFunction} provided to the constructor (Spring beans annotated with {@link MathematicalFunctionContainer}).<br>
+ * Methods in these beans which are annotated with {@link MethodConstraint} are being intercepted before invocation.
  * 
  * @author mark
  *
@@ -55,8 +52,7 @@ public class MathematicalFunctionInvoker {
 	private final Class<? extends NumberOperations<?>> numberClass;
 
 	/**
-	 * Collection of spring beans which are of type {@link AbstractFunction}
-	 * which are (indirectly) annotated with @link MathematicalFunctionContainer
+	 * Collection of spring beans which are of type {@link AbstractFunction} which are (indirectly) annotated with @link MathematicalFunctionContainer
 	 */
 	private final List<AbstractFunction> beans;
 
@@ -189,12 +185,18 @@ public class MathematicalFunctionInvoker {
 				Object object = proxies.get(type);
 				if (object != null) {
 					LOGGER.debug("Injecting proxy property {} in proxied object of type {}", type.getCanonicalName(), clazz.getCanonicalName());
-					field.setAccessible(true);
+					boolean isPublic = Modifier.isPublic(field.getModifiers());
+					if (!isPublic) {
+						field.setAccessible(true);
+					}
 					try {
 						field.set(proxy, object);
 					} catch (IllegalArgumentException | IllegalAccessException e) {
 						// TODO message
 						throw new IllegalStateException(e);
+					}
+					if (!isPublic) {
+						field.setAccessible(false);
 					}
 				}
 			}
@@ -206,8 +208,7 @@ public class MathematicalFunctionInvoker {
 	}
 
 	/**
-	 * Method populates the availableMethods map In order to be added methods
-	 * should be:
+	 * Method populates the availableMethods map In order to be added methods should be:
 	 * <ul>
 	 * <li>annotated with {@link MathematicalFunction}</li>
 	 * <li>a public instance method</li>
@@ -236,16 +237,16 @@ public class MathematicalFunctionInvoker {
 						if (parameterTypes != null) {
 							parameterList = StringUtils.join(method.getParameterTypes(), ", ");
 						}
-						throw new IllegalStateException(String.format("The alias '%s' used for %s.%s(%s) does not comply to the format for an alias '%s.'",
-								alias, clazz.getCanonicalName(), method.getName(), parameterList, REGEX_ALIAS.pattern()));
+						throw new IllegalStateException(String.format("The alias '%s' used for %s.%s(%s) does not comply to the format for an alias '%s.'", alias, clazz.getCanonicalName(),
+								method.getName(), parameterList, REGEX_ALIAS.pattern()));
 					}
 					// String argumentsSignature =
 					// getArgumentsSignature(method);
 					int numberOfArguments = method.getParameterTypes().length;
 					Method put = availableMethodAliasMap.put(new SimpleEntry<String, Integer>(alias, numberOfArguments), method);
 					if (put != null) {
-						throw new IllegalStateException(String.format("\nThe alias %s used for\n%s.%s has allready been used for\n%s.%s ", alias, method
-								.getDeclaringClass().getCanonicalName(), method.getName(), put.getDeclaringClass().getCanonicalName(), put.getName()));
+						throw new IllegalStateException(String.format("\nThe alias %s used for\n%s.%s has allready been used for\n%s.%s ", alias, method.getDeclaringClass()
+								.getCanonicalName(), method.getName(), put.getDeclaringClass().getCanonicalName(), put.getName()));
 					}
 				}
 			}
@@ -260,12 +261,9 @@ public class MathematicalFunctionInvoker {
 	 * The method is valid if<br>
 	 * <ul>
 	 * <li>the method is a public instance method</li>
-	 * <li>the method's return type is of the type as specified in
-	 * {@link MathematicalFunctionInvoker#numberClass}</li>
+	 * <li>the method's return type is of the type as specified in {@link MathematicalFunctionInvoker#numberClass}</li>
 	 * <li>the method has one or more arguments</li>
-	 * <li>the method's arguments are of the type as specified in
-	 * {@link MathematicalFunctionInvoker#numberClass} or in case of a
-	 * collection the component type is as specified in
+	 * <li>the method's arguments are of the type as specified in {@link MathematicalFunctionInvoker#numberClass} or in case of a collection the component type is as specified in
 	 * {@link MathematicalFunctionInvoker#numberClass}</li>
 	 * </ul>
 	 * <br>
@@ -276,17 +274,15 @@ public class MathematicalFunctionInvoker {
 		// Check the method's signature
 		LOGGER.info("Validating if the method {}.{} is a public instance method", method.getDeclaringClass().getCanonicalName(), method.getName());
 		if (Modifier.isPrivate(method.getModifiers()) || Modifier.isStatic(method.getModifiers())) {
-			ANNOTATED_METHOD_NOT_PUBLIC_INSTANCE_METHOD.throwUncheckedException(IllegalStateException.class,
-					MathematicalFunction.class.getCanonicalName(), method.getDeclaringClass().getCanonicalName(), method.getName());
+			ANNOTATED_METHOD_NOT_PUBLIC_INSTANCE_METHOD.throwUncheckedException(IllegalStateException.class, MathematicalFunction.class.getCanonicalName(), method.getDeclaringClass()
+					.getCanonicalName(), method.getName());
 		}
 
 		// Check the method's return type
-		LOGGER.info("Validating if the method {}.{} return type is {}", new String[] { method.getDeclaringClass().getCanonicalName(), method.getName(),
-				numberClass.getCanonicalName() });
+		LOGGER.info("Validating if the method {}.{} return type is {}", new String[] { method.getDeclaringClass().getCanonicalName(), method.getName(), numberClass.getCanonicalName() });
 		Class<?> actualReturnType = method.getReturnType();
 		if (numberClass != actualReturnType) {
-			WRONG_METHOD_RETURN_TYPE.throwUncheckedException(IllegalStateException.class, actualReturnType.getCanonicalName(),
-					numberClass.getCanonicalName());
+			WRONG_METHOD_RETURN_TYPE.throwUncheckedException(IllegalStateException.class, actualReturnType.getCanonicalName(), numberClass.getCanonicalName());
 		}
 
 		// Check method's argument types
@@ -319,10 +315,8 @@ public class MathematicalFunctionInvoker {
 	}
 
 	/**
-	 * Method to create a proxied instance of the specified class If the method
-	 * in the supplied class contains {@link MethodConstraint} annotated
-	 * arguments the method is handled (intercepted) In this case the supplied
-	 * arguments are validated before invocation
+	 * Method to create a proxied instance of the specified class If the method in the supplied class contains {@link MethodConstraint} annotated arguments the method is handled
+	 * (intercepted) In this case the supplied arguments are validated before invocation
 	 * 
 	 * @param clazz
 	 *            The class to be proxied
@@ -387,8 +381,8 @@ public class MathematicalFunctionInvoker {
 
 	@Override
 	public String toString() {
-		return String.format("MathematicalFunctionInvoker\nArithmetic function groups: %s\nBase number for arithmetic operations: %s",
-				StringUtils.join(getBeanNames(), ", "), numberClass.getCanonicalName());
+		return String.format("MathematicalFunctionInvoker\nArithmetic function groups: %s\nBase number for arithmetic operations: %s", StringUtils.join(getBeanNames(), ", "),
+				numberClass.getCanonicalName());
 	}
 
 }

@@ -57,15 +57,14 @@ public class ApplicationPropertiesTest {
 		String fullyQualifiedPropertyNameTwo = "nl.smith.mathematics.functions.TaylorSeriesImpl.taylorNumber";
 		properties.setProperty(fullyQualifiedPropertyNameTwo, "50");
 
-		String fullyQualifiedPropertyNameThree = "nl.smith.mathematics.functions.QGoniometricFunctionsImpl.PI";
+		String fullyQualifiedPropertyNameThree = "nl.smith.mathematics.functions.QGoniometricFunctionsImpl.pi";
 		properties.setProperty(fullyQualifiedPropertyNameThree, "3.14");
 
 		ApplicationProperties applicationContext = getApplicationProperties();
 
 		setSystemProperties(properties, getApplicationProperties());
 
-		assertEquals(String.format("Test property: %s", fullyQualifiedPropertyNameOne), AngleType.GRAD,
-				applicationContext.getObjectProperty(AngleType.class, fullyQualifiedPropertyNameOne));
+		assertEquals(String.format("Test property: %s", fullyQualifiedPropertyNameOne), AngleType.GRAD, applicationContext.getObjectProperty(AngleType.class, fullyQualifiedPropertyNameOne));
 
 		assertEquals(String.format("Test property: %s", fullyQualifiedPropertyNameTwo), BigInteger.valueOf(50),
 				applicationContext.getObjectProperty(BigInteger.class, fullyQualifiedPropertyNameTwo));

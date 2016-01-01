@@ -1,12 +1,12 @@
 package nl.smith.mathematics.main;
 
-import nl.smith.mathematics.functions.rational.LogarithmicFunctionsImpl;
+import nl.smith.mathematics.functions.rational.GoniometricFunctionsImpl;
 
 public abstract class MainTest {
 
 	public static void main(String[] args) {
-		LogarithmicFunctionsImpl functionsImpl = new LogarithmicFunctionsImpl();
-		System.out.println(functionsImpl.getEulersNumber());
+		GoniometricFunctionsImpl functionsImpl = new GoniometricFunctionsImpl();
+		System.out.println(functionsImpl.getTaylorNumber());
 
 	}
 

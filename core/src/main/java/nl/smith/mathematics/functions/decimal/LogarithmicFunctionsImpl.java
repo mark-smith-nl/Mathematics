@@ -3,6 +3,7 @@ package nl.smith.mathematics.functions.decimal;
 import java.math.BigInteger;
 
 import nl.smith.mathematics.functions.LogarithmicFunctions;
+import nl.smith.mathematics.functions.annotation.FunctionProperty;
 import nl.smith.mathematics.number.DecimalNumber;
 
 import org.slf4j.Logger;
@@ -14,14 +15,15 @@ public class LogarithmicFunctionsImpl extends LogarithmicFunctions<DecimalNumber
 	@SuppressWarnings("unused")
 	private static final Logger LOGGER = LoggerFactory.getLogger(LogarithmicFunctionsImpl.class);
 
-	private final BigInteger taylorNumber;
+	@FunctionProperty
+	private BigInteger taylorNumber;
 
-	private final DecimalNumber eulersNumber;
+	@FunctionProperty
+	private DecimalNumber eulersNumber;
 
 	/** Spring instantiated bean */
 	public LogarithmicFunctionsImpl() {
-		taylorNumber = (BigInteger) getFunctionContext().get("taylorNumber");
-		eulersNumber = (DecimalNumber) getFunctionContext().get("eulersNumber");
+
 	}
 
 	// Constructor for instantiating proxy

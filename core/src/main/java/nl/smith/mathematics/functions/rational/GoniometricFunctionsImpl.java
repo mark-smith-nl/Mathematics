@@ -41,6 +41,7 @@ public class GoniometricFunctionsImpl extends GoniometricFunctions<RationalNumbe
 
 	// Constructor for instantiating proxy
 	public GoniometricFunctionsImpl(GoniometricFunctionsImpl goniometricFunctionsImpl) {
+		System.out.println("Yessssssssssssssssssssssssssssssssssssssssssssss");
 		taylorNumber = goniometricFunctionsImpl.taylorNumber;
 		angleType = goniometricFunctionsImpl.angleType;
 		// pi = goniometricFunctionsImpl.pi;

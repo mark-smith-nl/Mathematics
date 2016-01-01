@@ -150,7 +150,7 @@ public class FunctionContextHelper {
 				CAN_NOT_OPEN_RESOURCE.throwUncheckedException(IllegalStateException.class, resourcePath);
 			}
 		} else {
-			LOGGER.info("Resource '{}' not found.\\nNo context will be created.", resourcePath);
+			LOGGER.info("Resource '{}' not found.\nEmpty context will be created.", resourcePath);
 		}
 
 		return properties;
