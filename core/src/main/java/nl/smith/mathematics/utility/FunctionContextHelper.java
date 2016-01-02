@@ -73,7 +73,7 @@ public class FunctionContextHelper {
 
 	public static final String NUMBER_FACTORY_METHOD_NAME = "valueOf";
 
-	private static final Map<Class<? extends NumberOperations<?>>, Method> NUMBER_FACTORY_METHODS = new HashMap<>();
+	private static final Map<Class<?>, Method> INSTANCE_FACTORY_METHODS = new HashMap<>();
 
 	private static final Map<Class<?>, Constructor<?>> constructorsWithStringArgument = new HashMap<>();
 
@@ -165,7 +165,7 @@ public class FunctionContextHelper {
 	 *            the string value used to create the instance
 	 * @return instance of the specified type (propertyType)
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings("unchecked")
 	public static <T> T stringToObject(Class<T> propertyType, String propertyStringValue) {
 		if (propertyType == null) {
 			METHOD_ARGUMENT_CAN_NOT_BE_NULL.throwUncheckedException(IllegalArgumentException.class, "propertyType");
@@ -177,20 +177,7 @@ public class FunctionContextHelper {
 
 		T instance = null;
 
-		if (propertyType.isEnum()) {
-			try {
-				instance = (T) Enum.valueOf((Class<Enum>) propertyType, propertyStringValue);
-			} catch (IllegalArgumentException e) {
-				STRING_NUMBER_PARSE_ERROR.throwUncheckedException(IllegalArgumentException.class, propertyStringValue, propertyType.getCanonicalName());
-			}
-		} else if (propertyType.equals(Boolean.class) || propertyType.equals(String.class) || propertyType.equals(Integer.class) || propertyType.equals(BigInteger.class)
-				|| propertyType.equals(BigDecimal.class)) {
-			try {
-				instance = (T) getConstructorForTypeWithStringArgument(propertyType).newInstance(propertyStringValue);
-			} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-				STRING_NUMBER_PARSE_ERROR.throwUncheckedException(IllegalArgumentException.class, e, propertyStringValue, propertyType.getCanonicalName());
-			}
-		} else if (propertyType.equals(DateTime.class)) {
+		if (propertyType.equals(DateTime.class)) {
 			DateTimeFormatter dtf = null;
 			if (Pattern.matches(REGEX_DATE, propertyStringValue)) {
 				dtf = DATE_FORMATTER;
@@ -200,7 +187,6 @@ public class FunctionContextHelper {
 				// TODO Error message
 				System.out.println("Fout");
 			}
-
 			instance = (T) dtf.parseDateTime(propertyStringValue);
 		} else if (propertyType.equals(LocalDate.class)) {
 			DateTimeFormatter dtf = null;
@@ -210,15 +196,21 @@ public class FunctionContextHelper {
 				// TODO Error message
 				System.out.println("Fout");
 			}
-
 			instance = (T) dtf.parseLocalDate(propertyStringValue);
-		} else if (NumberOperations.class.isAssignableFrom(propertyType)) {
-			Class<NumberOperations<?>> clazz = (Class<NumberOperations<?>>) propertyType;
-			Method numberFactory = getNumberFactoryMethod(clazz);
-
+		} else if (propertyType.isEnum() || propertyType.equals(Boolean.class) || propertyType.equals(Integer.class) || propertyType.equals(Long.class) || propertyType.equals(Double.class)
+				|| NumberOperations.class.isAssignableFrom(propertyType)) {
+			// Construct an instance using the static factory method valueOf(String) in the specified class
+			Method instanceFactoryMethod = getInstanceFactoryMethod(propertyType);
 			try {
-				instance = (T) numberFactory.invoke(null, propertyStringValue);
+				instance = (T) instanceFactoryMethod.invoke(null, propertyStringValue);
 			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+				STRING_NUMBER_PARSE_ERROR.throwUncheckedException(IllegalArgumentException.class, e, propertyStringValue, propertyType.getCanonicalName());
+			}
+		} else if (propertyType.equals(String.class) || propertyType.equals(BigInteger.class) || propertyType.equals(BigDecimal.class)) {
+			// Construct an instance using the constructor(String) in the specified class
+			try {
+				instance = (T) getConstructorForTypeWithStringArgument(propertyType).newInstance(propertyStringValue);
+			} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 				STRING_NUMBER_PARSE_ERROR.throwUncheckedException(IllegalArgumentException.class, e, propertyStringValue, propertyType.getCanonicalName());
 			}
 		} else {
@@ -229,13 +221,13 @@ public class FunctionContextHelper {
 
 	}
 
-	private static Method getNumberFactoryMethod(Class<? extends NumberOperations<?>> clazz) {
-		Method numberFactoryMethod = NUMBER_FACTORY_METHODS.get(clazz);
+	private static Method getInstanceFactoryMethod(Class<?> clazz) {
+		Method instanceFactoryMethod = INSTANCE_FACTORY_METHODS.get(clazz);
 
-		if (numberFactoryMethod == null) {
+		if (instanceFactoryMethod == null) {
 			try {
-				numberFactoryMethod = clazz.getDeclaredMethod(NUMBER_FACTORY_METHOD_NAME, String.class);
-				if (!Modifier.isStatic(numberFactoryMethod.getModifiers()) && !Modifier.isPublic(numberFactoryMethod.getModifiers())) {
+				instanceFactoryMethod = clazz.getDeclaredMethod(NUMBER_FACTORY_METHOD_NAME, String.class);
+				if (!Modifier.isStatic(instanceFactoryMethod.getModifiers()) && !Modifier.isPublic(instanceFactoryMethod.getModifiers())) {
 					throw new IllegalStateException(String.format("Missing public static method %s.%s(%s)", clazz.getCanonicalName(), NUMBER_FACTORY_METHOD_NAME,
 							String.class.getCanonicalName()));
 				}
@@ -243,10 +235,10 @@ public class FunctionContextHelper {
 				REQUIRED_METHOD_NOT_RETRIEVED.throwUncheckedException(IllegalStateException.class, e, "public static", clazz.getCanonicalName(), clazz.getCanonicalName(),
 						NUMBER_FACTORY_METHOD_NAME, String.class.getCanonicalName());
 			}
-			NUMBER_FACTORY_METHODS.put(clazz, numberFactoryMethod);
+			INSTANCE_FACTORY_METHODS.put(clazz, instanceFactoryMethod);
 		}
 
-		return numberFactoryMethod;
+		return instanceFactoryMethod;
 	}
 
 	private static <T> Constructor<T> getConstructorForTypeWithStringArgument(Class<T> clazz) {

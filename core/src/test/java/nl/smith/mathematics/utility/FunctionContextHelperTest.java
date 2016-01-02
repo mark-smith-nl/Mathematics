@@ -269,7 +269,8 @@ public class FunctionContextHelperTest {
 		String propertyStringValue = "tRuE";
 		Class<?> propertyType = Boolean.class;
 		assertEquals(Boolean.TRUE, FunctionContextHelper.stringToObject(propertyType, propertyStringValue));
-		assertFalse(Boolean.TRUE == FunctionContextHelper.stringToObject(propertyType, propertyStringValue));
+		// A new instance was created
+		assertFalse(Boolean.FALSE == FunctionContextHelper.stringToObject(propertyType, propertyStringValue));
 
 		propertyStringValue = "Test";
 		propertyType = String.class;
@@ -304,7 +305,8 @@ public class FunctionContextHelperTest {
 		try {
 			FunctionContextHelper.stringToObject(propertyType, propertyStringValue);
 		} catch (RuntimeException e) {
-			checkExceptionAndRethrow(e, IllegalArgumentException.class, null, STRING_NUMBER_PARSE_ERROR.getFormattedErrorMessage(propertyStringValue, propertyType.getCanonicalName()));
+			checkExceptionAndRethrow(e, IllegalArgumentException.class, InvocationTargetException.class,
+					STRING_NUMBER_PARSE_ERROR.getFormattedErrorMessage(propertyStringValue, propertyType.getCanonicalName()));
 		}
 	}
 
