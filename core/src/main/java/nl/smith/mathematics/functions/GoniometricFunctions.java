@@ -4,7 +4,7 @@ import nl.smith.mathematics.functions.annotation.MathematicalFunctionContainer;
 import nl.smith.mathematics.number.NumberOperations;
 
 @MathematicalFunctionContainer(name = "Goniometric functions", description = "Set of goniometric functions")
-public abstract class GoniometricFunctions<T extends NumberOperations<?>> extends AbstractFunction {
+public abstract class GoniometricFunctions<T extends NumberOperations<?>> extends AbstractFunction<GoniometricFunctions<T>> {
 
 	public GoniometricFunctions() {
 		super();

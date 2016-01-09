@@ -2,7 +2,7 @@ package nl.smith.mathematics.functions;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 import nl.smith.mathematics.functions.annotation.FunctionProperty;
@@ -12,33 +12,34 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class AbstractFunction {
+public abstract class AbstractFunction<T extends AbstractFunction<?>> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractFunction.class);
 
 	public AbstractFunction() {
-		Class<? extends AbstractFunction> clazz = this.getClass();
+		Class<?> clazz = this.getClass();
 		LOGGER.info("Create instance of class {}", clazz.getCanonicalName());
 		setFunctionProperties(clazz);
 	}
 
-	@SuppressWarnings("unchecked")
-	private void setFunctionProperties(Class<? extends AbstractFunction> clazz) {
+	private void setFunctionProperties(Class<?> clazz) {
 		while (clazz != AbstractFunction.class) {
-			Map<String, Object> functionContext = Collections.unmodifiableMap(FunctionContextHelper.makeFunctionContext(clazz));
-			setFunctionProperties(clazz, functionContext);
-			clazz = (Class<? extends AbstractFunction>) clazz.getSuperclass();
+			Map<String, Field> canonicalPropertyNameFieldMap = new HashMap<>();
+			Map<String, Boolean> canonicalPropertyNameIsNullableMap = new HashMap<>();
+			Map<String, Class<?>> canonicalPropertyNameFieldTypeMap = new HashMap<>();
+			setCanonicalPropertyNameFieldAndFieldTypeMaps(clazz, canonicalPropertyNameFieldMap, canonicalPropertyNameIsNullableMap, canonicalPropertyNameFieldTypeMap);
+			Map<String, Object> functionContext = FunctionContextHelper.makeFunctionContext(clazz, canonicalPropertyNameFieldTypeMap);
+			setFunctionProperties(clazz, canonicalPropertyNameFieldMap, canonicalPropertyNameIsNullableMap, functionContext);
+			clazz = clazz.getSuperclass();
 		}
 	}
 
-	private void setFunctionProperties(Class<? extends AbstractFunction> clazz, Map<String, Object> functionContext) {
-		LOGGER.info("Setting function properties for class {}", clazz);
-
+	private void setCanonicalPropertyNameFieldAndFieldTypeMaps(Class<?> clazz, Map<String, Field> canonicalPropertyNameFieldMap, Map<String, Boolean> canonicalPropertyNameIsNullableMap,
+			Map<String, Class<?>> canonicalPropertyNameFieldTypeMap) {
 		Field[] fields = clazz.getDeclaredFields();
 		for (Field field : fields) {
 			FunctionProperty annotation = field.getAnnotation(FunctionProperty.class);
 			if (annotation != null) {
-				LOGGER.info("Setting function property for {}.{}", clazz, field.getName());
 				String simplePropertyName = annotation.simplePropertyName();
 				if (StringUtils.isBlank(simplePropertyName)) {
 					LOGGER.debug("No name specified for property {}.{}.", clazz, field.getName());
@@ -50,48 +51,62 @@ public abstract class AbstractFunction {
 					canonicalPropertyName = clazz.getCanonicalName() + "." + canonicalPropertyName;
 				}
 
-				try {
-					LOGGER.info("Retrieving string value for property with key {}.", canonicalPropertyName);
-					Object propertyValue = functionContext.get(canonicalPropertyName);
-					if (propertyValue == null && !annotation.nullable()) {
-						// TODO implement message
-						throw new IllegalStateException(String.format("Fout waarde niet gevonden voor: '%s.%s'.\nProperty key: '%s'", clazz.getCanonicalName(), field.getName(),
-								canonicalPropertyName));
-					}
-
-					int modifiers = field.getModifiers();
-					if (Modifier.isFinal(modifiers)) {
-						throw new IllegalStateException("Fout property is final voor: " + field.getName());
-					}
-					if (Modifier.isStatic(modifiers)) {
-						throw new IllegalStateException("Fout property is static voor: " + field.getName());
-					}
-					boolean isPublic = Modifier.isPublic(modifiers);
-
-					if (!isPublic) {
-						field.setAccessible(true);
-					}
-					field.set(this, propertyValue);
-					if (!isPublic) {
-						field.setAccessible(false);
-					}
-				} catch (IllegalArgumentException | IllegalAccessException e) {
-					// TODO implement message
-					throw new IllegalStateException("Fout", e);
+				if (canonicalPropertyNameFieldMap.put(canonicalPropertyName, field) != null) {
+					throw new IllegalStateException("Implement message");
 				}
+
+				canonicalPropertyNameIsNullableMap.put(canonicalPropertyName, annotation.nullable());
+
+				canonicalPropertyNameFieldTypeMap.put(canonicalPropertyName, field.getType());
 			}
 		}
 	}
 
-	// Constructor for instantiating proxy
-	public <T extends AbstractFunction> AbstractFunction(T baseObject) {
-		Class<? extends AbstractFunction> clazz = this.getClass();
-		LOGGER.info("Create instance proxy instance of class {} using {}", clazz.getCanonicalName(), baseObject.toString());
-		copyFunctionProperties(clazz, baseObject);
+	private void setFunctionProperties(Class<?> clazz, Map<String, Field> canonicalPropertyNameFieldMap, Map<String, Boolean> canonicalPropertyNameIsNullableMap,
+			Map<String, Object> functionContext) {
+		LOGGER.info("Setting function properties for class {}", clazz);
+
+		for (String canonicalPropertyName : canonicalPropertyNameFieldMap.keySet()) {
+			Field field = canonicalPropertyNameFieldMap.get(canonicalPropertyName);
+			Boolean isNullable = canonicalPropertyNameIsNullableMap.get(canonicalPropertyName);
+			try {
+				LOGGER.info("Retrieving string value for property with key {}.", canonicalPropertyName);
+				Object propertyValue = functionContext.get(canonicalPropertyName);
+				if (propertyValue == null && !isNullable) {
+					// TODO implement message
+					throw new IllegalStateException(String.format("Fout waarde niet gevonden voor: '%s.%s'.\nProperty key: '%s'", clazz.getCanonicalName(), field.getName(),
+							canonicalPropertyName));
+				}
+
+				int modifiers = field.getModifiers();
+				if (Modifier.isFinal(modifiers)) {
+					throw new IllegalStateException("Fout property is final voor: " + field.getName());
+				}
+				if (Modifier.isStatic(modifiers)) {
+					throw new IllegalStateException("Fout property is static voor: " + field.getName());
+				}
+				boolean isPublic = Modifier.isPublic(modifiers);
+
+				if (!isPublic) {
+					field.setAccessible(true);
+				}
+				field.set(this, propertyValue);
+				if (!isPublic) {
+					field.setAccessible(false);
+				}
+			} catch (IllegalArgumentException | IllegalAccessException e) {
+				// TODO implement message
+				throw new IllegalStateException("Fout", e);
+			}
+
+		}
 	}
 
-	@SuppressWarnings("unchecked")
-	private void copyFunctionProperties(Class<? extends AbstractFunction> clazz, Object baseObject) { // TODO Auto-generated method stub
+	// Constructor for instantiating proxy
+	public AbstractFunction(T baseObject) {
+		Class<?> clazz = this.getClass();
+		LOGGER.info("Create instance proxy instance of class {} using {}", clazz.getCanonicalName(), baseObject.toString());
+
 		while (clazz != AbstractFunction.class) {
 			Field[] declaredFields = clazz.getDeclaredFields();
 			for (Field field : declaredFields) {
@@ -113,7 +128,7 @@ public abstract class AbstractFunction {
 				}
 
 			}
-			clazz = (Class<? extends AbstractFunction>) clazz.getSuperclass();
+			clazz = clazz.getSuperclass();
 		}
 	}
 

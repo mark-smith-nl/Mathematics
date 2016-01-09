@@ -11,6 +11,7 @@ import static org.junit.Assert.assertTrue;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.HashMap;
 import java.util.Map;
 
 import nl.smith.mathematics.functions.AbstractFunction;
@@ -376,7 +377,12 @@ public class FunctionContextHelperTest {
 	public void makeFunctionContextWithPropertyFile() {
 		Class<? extends AbstractFunction> clazz = AnotherTestFunction.class;
 
-		Map<String, Object> functionContext = FunctionContextHelper.makeFunctionContext(clazz);
+		Map<String, Class<?>> providedPropertyTypes = new HashMap<>();
+		providedPropertyTypes.put("myGender", SEXE.class);
+		providedPropertyTypes.put("myBirthDate", LocalDate.class);
+
+		Map<String, Object> functionContext = FunctionContextHelper.makeFunctionContext(clazz, providedPropertyTypes);
+
 		assertEquals(3, functionContext.size());
 		assertEquals("Mark Smith", functionContext.get("myName"));
 		assertEquals(SEXE.MALE, functionContext.get("myGender"));
@@ -388,8 +394,14 @@ public class FunctionContextHelperTest {
 	public void makeFunctionContextWithPropertyFileWithSystemProperty() {
 		Class<? extends AbstractFunction> clazz = AnotherTestFunction.class;
 
+		Map<String, Class<?>> providedPropertyTypes = new HashMap<>();
+		providedPropertyTypes.put("myGender", SEXE.class);
+		providedPropertyTypes.put("myBirthDate", LocalDate.class);
+
 		System.setProperty("myGender", "FEMALE");
-		Map<String, Object> functionContext = FunctionContextHelper.makeFunctionContext(clazz);
+
+		Map<String, Object> functionContext = FunctionContextHelper.makeFunctionContext(clazz, providedPropertyTypes);
+
 		assertEquals(3, functionContext.size());
 		assertEquals("Mark Smith", functionContext.get("myName"));
 		assertEquals(SEXE.FEMALE, functionContext.get("myGender"));

@@ -82,14 +82,18 @@ public class FunctionContextHelper {
 		throw new IllegalAccessError();
 	}
 
-	public static <T extends AbstractFunction> Map<String, Object> makeFunctionContext(Class<T> functionClass) {
+	public static Map<String, Object> makeFunctionContext(Class<?> functionClass) {
+		return makeFunctionContext(functionClass, new HashMap<String, Class<?>>());
+	}
+
+	public static Map<String, Object> makeFunctionContext(Class<?> functionClass, Map<String, Class<?>> providedPropertyTypes) {
 		if (functionClass == null) {
 			METHOD_ARGUMENT_CAN_NOT_BE_NULL.throwUncheckedException(IllegalArgumentException.class, "functionClass");
 		}
 
 		Map<String, Object> functionContext = new HashMap<>();
 
-		Map<String, Class<?>> propertyTypes = new HashMap<>();
+		Map<String, Class<?>> propertyTypes = new HashMap<>(providedPropertyTypes);
 		Map<String, String> propertyValues = new HashMap<>();
 
 		Properties properties = makePropertiesForClass(functionClass);
@@ -98,13 +102,17 @@ public class FunctionContextHelper {
 			String propertyName = (String) entry.getKey();
 			if (propertyName.endsWith(TYPE_SPECIFIER_STRING)) {
 				propertyName = StringUtils.substringBefore(propertyName, TYPE_SPECIFIER_STRING);
-				Class<?> propertyType = null;
-				try {
-					propertyType = Class.forName((String) entry.getValue());
-				} catch (ClassNotFoundException e) {
-					CAN_NOT_LOAD_CLASS.throwUncheckedException(IllegalStateException.class, "propertyType");
+				Class<?> propertyType = providedPropertyTypes.get(propertyName);
+				if (propertyType == null) {
+					try {
+						propertyType = Class.forName((String) entry.getValue());
+					} catch (ClassNotFoundException e) {
+						CAN_NOT_LOAD_CLASS.throwUncheckedException(IllegalStateException.class, "propertyType");
+					}
+					propertyTypes.put(StringUtils.substringBefore(propertyName, TYPE_SPECIFIER_STRING), propertyType);
+				} else {
+					LOGGER.info("Property type for {} already set to {}.\nPlease remove redundant key value pair from property file.", propertyName, propertyType.getCanonicalName());
 				}
-				propertyTypes.put(StringUtils.substringBefore(propertyName, TYPE_SPECIFIER_STRING), propertyType);
 			} else {
 				propertyValues.put(propertyName, (String) entry.getValue());
 			}
@@ -139,11 +147,13 @@ public class FunctionContextHelper {
 				while (propertyNames.hasMoreElements()) {
 					String propertyName = (String) propertyNames.nextElement();
 					LOGGER.debug("Property {}={}", propertyName, properties.getProperty(propertyName));
-					String systemProperty = System.getProperty(propertyName);
-					if (systemProperty != null) {
-						LOGGER.info("Property {} is overriden", propertyName);
-						properties.setProperty(propertyName, systemProperty);
-						LOGGER.info("Property {}={}", propertyName, properties.getProperty(propertyName));
+					if (!propertyName.endsWith(TYPE_SPECIFIER_STRING)) {
+						String systemProperty = System.getProperty(propertyName);
+						if (systemProperty != null) {
+							LOGGER.info("Property {} is overriden", propertyName);
+							properties.setProperty(propertyName, systemProperty);
+							LOGGER.info("Property {}={}", propertyName, properties.getProperty(propertyName));
+						}
 					}
 				}
 			} catch (IOException e) {
