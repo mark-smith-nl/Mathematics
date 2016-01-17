@@ -51,13 +51,13 @@ public class ApplicationPropertiesTest {
 	public void getSpecifiedPropertySetAsSystemProperty() {
 		Properties properties = new Properties();
 
-		String fullyQualifiedPropertyNameOne = "nl.smith.mathematics.functions.QGoniometricFunctionsImpl.angleType";
+		String fullyQualifiedPropertyNameOne = "nl.smith.mathematics.functions.QGoniometricFunctionsImpl.ANGLETYPE";
 		properties.setProperty(fullyQualifiedPropertyNameOne, "GRAD");
 
-		String fullyQualifiedPropertyNameTwo = "nl.smith.mathematics.functions.TaylorSeriesImpl.taylorNumber";
+		String fullyQualifiedPropertyNameTwo = "nl.smith.mathematics.functions.TaylorSeriesImpl.TAYLORNUMBER";
 		properties.setProperty(fullyQualifiedPropertyNameTwo, "50");
 
-		String fullyQualifiedPropertyNameThree = "nl.smith.mathematics.functions.QGoniometricFunctionsImpl.pi";
+		String fullyQualifiedPropertyNameThree = "nl.smith.mathematics.functions.QGoniometricFunctionsImpl.PI";
 		properties.setProperty(fullyQualifiedPropertyNameThree, "3.14");
 
 		ApplicationProperties applicationContext = getApplicationProperties();

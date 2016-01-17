@@ -18,39 +18,32 @@ import org.springframework.stereotype.Component;
 @Component
 public class GoniometricFunctionsImpl extends GoniometricFunctions<RationalNumber> {
 
-	@SuppressWarnings("unused")
 	private static final Logger LOGGER = LoggerFactory.getLogger(GoniometricFunctionsImpl.class);
 
 	private static final BigInteger TWO = BigInteger.valueOf(2);
 
 	private static final BigInteger FOUR = BigInteger.valueOf(4);
 
-	@FunctionProperty(simplePropertyName = "taylorNumber", prefixWithCanonicalClassName = false)
-	private BigInteger taylorNumber;
+	@FunctionProperty
+	private final AngleType ANGELTYPE = null;
 
 	@FunctionProperty
-	private AngleType angleType;
-
-	@FunctionProperty
-	private RationalNumber pi;
+	private final RationalNumber PI = new RationalNumber(314, 100);
 
 	/** Spring instantiated bean */
 	public GoniometricFunctionsImpl() {
-		super();
+		setFunctionProperties();
 	}
 
-	// Constructor for instantiating proxy
+	/** Constructor for instantiating proxy */
 	public GoniometricFunctionsImpl(GoniometricFunctionsImpl baseObject) {
-		super(baseObject);
-	}
-
-	public BigInteger getTaylorNumber() {
-		return taylorNumber;
+		LOGGER.info("Create instance proxy instance of class {} using {}", this.getClass().getCanonicalName(), baseObject.toString());
+		setFunctionProperties(baseObject);
 	}
 
 	@Override
-	public AngleType getAngleType() {
-		return angleType;
+	public AngleType getANGELTYPE() {
+		return ANGELTYPE;
 	}
 
 	@Override
@@ -60,24 +53,24 @@ public class GoniometricFunctionsImpl extends GoniometricFunctions<RationalNumbe
 	}
 
 	@Override
-	public RationalNumber getPi() {
-		return pi;
+	public RationalNumber getPI() {
+		return PI;
 	}
 
 	@SuppressWarnings("unused")
 	private RationalNumber calculatePi() {
 		BigInteger i = ONE;
-		RationalNumber pi = new RationalNumber(BigInteger.valueOf(3));
+		RationalNumber PI = new RationalNumber(BigInteger.valueOf(3));
 		boolean substact = false;
-		while (i.compareTo(taylorNumber) < 0) {
+		while (i.compareTo(getTAYLORNUMBER()) < 0) {
 			BigInteger offset = TWO.multiply(i);
 			BigInteger denominator = offset.multiply(offset.add(ONE)).multiply(offset.add(TWO));
-			pi = substact ? pi.subtract(new RationalNumber(FOUR, denominator)) : pi.add(new RationalNumber(FOUR, denominator));
+			PI = substact ? PI.subtract(new RationalNumber(FOUR, denominator)) : PI.add(new RationalNumber(FOUR, denominator));
 			substact = !substact;
 			i = i.add(ONE);
 		}
 
-		return pi;
+		return PI;
 	}
 
 	/**
@@ -92,7 +85,7 @@ public class GoniometricFunctionsImpl extends GoniometricFunctions<RationalNumbe
 		RationalNumber squareX = x.multiply(x);
 		boolean subtract = true;
 
-		while (i.compareTo(taylorNumber) < 0) {
+		while (i.compareTo(getTAYLORNUMBER()) < 0) {
 			i = i.add(ONE);
 			BigInteger j = i.multiply(TWO).subtract(ONE);
 			BigInteger k = j.subtract(ONE);
@@ -115,7 +108,7 @@ public class GoniometricFunctionsImpl extends GoniometricFunctions<RationalNumbe
 		RationalNumber sum = new RationalNumber(ONE);
 		RationalNumber squareX = x.multiply(x);
 		boolean subtract = true;
-		BigInteger times = taylorNumber.subtract(ONE);
+		BigInteger times = getTAYLORNUMBER().subtract(ONE);
 		while (i.compareTo(times) < 0) {
 			i = i.add(ONE);
 			BigInteger j = i.multiply(TWO);
@@ -130,7 +123,7 @@ public class GoniometricFunctionsImpl extends GoniometricFunctions<RationalNumbe
 
 	@Override
 	public String toString() {
-		return "GoniometricFunctionsImpl [taylorNumber=" + taylorNumber + ", angleType=" + angleType + ", pi=" + pi + "]";
+		return "GoniometricFunctionsImpl [TAYLORNUMBER=" + getTAYLORNUMBER() + ", ANGELTYPE=" + getANGELTYPE() + ", PI=" + getPI() + "]";
 	}
 
 }

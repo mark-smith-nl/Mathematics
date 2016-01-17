@@ -13,6 +13,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 import nl.smith.mathematics.functions.AbstractFunction;
 import nl.smith.mathematics.number.NumberOperations;
@@ -29,7 +30,7 @@ import org.junit.Test;
  * @author mark
  *
  */
-public class FunctionContextHelperTest {
+public class FunctionContextHelperTest extends SystemPropertieChanger {
 
 	public static enum SEXE {
 		MALE, FEMALE
@@ -37,12 +38,12 @@ public class FunctionContextHelperTest {
 	}
 
 	// TestFunction has no associated property file.
-	private static class TestFunction extends AbstractFunction {
+	private static class TestFunction extends AbstractFunction<TestFunction> {
 
 	}
 
-	// TestFunction has no associated property file.
-	private static class AnotherTestFunction extends AbstractFunction {
+	// TestFunction has an associated property file.
+	private static class AnotherTestFunction extends AbstractFunction<AnotherTestFunction> {
 
 	}
 
@@ -50,175 +51,146 @@ public class FunctionContextHelperTest {
 
 		@Override
 		public int compareTo(TestNumberOperations o) {
-			// TODO Auto-generated method stub
 			return 0;
 		}
 
 		@Override
 		public boolean isNaturalNumber() {
-			// TODO Auto-generated method stub
 			return false;
 		}
 
 		@Override
 		public boolean isPositive() {
-			// TODO Auto-generated method stub
 			return false;
 		}
 
 		@Override
 		public boolean isNegative() {
-			// TODO Auto-generated method stub
 			return false;
 		}
 
 		@Override
 		public TestNumberOperations add(TestNumberOperations augend) {
-			// TODO Auto-generated method stub
 			return null;
 		}
 
 		@Override
 		public TestNumberOperations add(BigInteger augend) {
-			// TODO Auto-generated method stub
 			return null;
 		}
 
 		@Override
 		public TestNumberOperations add(long augend) {
-			// TODO Auto-generated method stub
 			return null;
 		}
 
 		@Override
 		public TestNumberOperations add(double augend) {
-			// TODO Auto-generated method stub
 			return null;
 		}
 
 		@Override
 		public TestNumberOperations subtract(TestNumberOperations subtrahend) {
-			// TODO Auto-generated method stub
 			return null;
 		}
 
 		@Override
 		public TestNumberOperations subtract(BigInteger subtrahend) {
-			// TODO Auto-generated method stub
 			return null;
 		}
 
 		@Override
 		public TestNumberOperations subtract(long subtrahend) {
-			// TODO Auto-generated method stub
 			return null;
 		}
 
 		@Override
 		public TestNumberOperations subtract(double subtrahend) {
-			// TODO Auto-generated method stub
 			return null;
 		}
 
 		@Override
 		public TestNumberOperations multiply(TestNumberOperations multiplicand) {
-			// TODO Auto-generated method stub
 			return null;
 		}
 
 		@Override
 		public TestNumberOperations multiply(BigInteger multiplicand) {
-			// TODO Auto-generated method stub
 			return null;
 		}
 
 		@Override
 		public TestNumberOperations multiply(long multiplicand) {
-			// TODO Auto-generated method stub
 			return null;
 		}
 
 		@Override
 		public TestNumberOperations multiply(double multiplicand) {
-			// TODO Auto-generated method stub
 			return null;
 		}
 
 		@Override
 		public TestNumberOperations divide(TestNumberOperations divisor) {
-			// TODO Auto-generated method stub
 			return null;
 		}
 
 		@Override
 		public TestNumberOperations divide(BigInteger divisor) {
-			// TODO Auto-generated method stub
 			return null;
 		}
 
 		@Override
 		public TestNumberOperations divide(long divisor) {
-			// TODO Auto-generated method stub
 			return null;
 		}
 
 		@Override
 		public TestNumberOperations divide(double divisor) {
-			// TODO Auto-generated method stub
 			return null;
 		}
 
 		@Override
 		public TestNumberOperations abs() {
-			// TODO Auto-generated method stub
 			return null;
 		}
 
 		@Override
 		public TestNumberOperations getReciprocalValue() {
-			// TODO Auto-generated method stub
 			return null;
 		}
 
 		@Override
 		public TestNumberOperations getIntegerPart() {
-			// TODO Auto-generated method stub
 			return null;
 		}
 
 		@Override
 		public TestNumberOperations getFractionalPart() {
-			// TODO Auto-generated method stub
 			return null;
 		}
 
 		@Override
 		public BigInteger getIntegerPartAsBigInteger() {
-			// TODO Auto-generated method stub
 			return null;
 		}
 
 		@Override
 		public TestNumberOperations negate() {
-			// TODO Auto-generated method stub
 			return null;
 		}
 
 		@Override
 		public String toStringExact() {
-			// TODO Auto-generated method stub
 			return null;
 		}
 
 		@Override
 		public String toString(int numberOfDigitsAfterDecimalPoint, boolean showDelta) {
-			// TODO Auto-generated method stub
 			return null;
 		}
 
 		@Override
 		public TestNumberOperations toStringGetDelta(StringBuffer resultBuffer, int numberOfDigitsAfterDecimalPoint, boolean showDelta) {
-			// TODO Auto-generated method stub
 			return null;
 		}
 
@@ -330,7 +302,7 @@ public class FunctionContextHelperTest {
 	public void stringToObjectUsingLocalDatePropertyValue() {
 		String propertyStringValue = "21-12-2015";
 		Class<LocalDate> propertyType = LocalDate.class;
-		LocalDate stringToObject = FunctionContextHelper.stringToObject(propertyType, propertyStringValue);
+
 		assertEquals(new LocalDate(2015, 12, 21), FunctionContextHelper.stringToObject(propertyType, propertyStringValue));
 	}
 
@@ -367,21 +339,26 @@ public class FunctionContextHelperTest {
 
 	@Test
 	public void makeFunctionContextWithoutPropertyFile() {
-		Class<? extends AbstractFunction> clazz = TestFunction.class;
+		Class<? extends AbstractFunction<TestFunction>> clazz = TestFunction.class;
 
 		Map<String, Object> functionContext = FunctionContextHelper.makeFunctionContext(clazz);
+
 		assertEquals(0, functionContext.size());
 	}
 
 	@Test
 	public void makeFunctionContextWithPropertyFile() {
-		Class<? extends AbstractFunction> clazz = AnotherTestFunction.class;
+		Class<? extends AbstractFunction<AnotherTestFunction>> clazz = AnotherTestFunction.class;
 
 		Map<String, Class<?>> providedPropertyTypes = new HashMap<>();
+		providedPropertyTypes.put("myName", String.class);
 		providedPropertyTypes.put("myGender", SEXE.class);
 		providedPropertyTypes.put("myBirthDate", LocalDate.class);
 
-		Map<String, Object> functionContext = FunctionContextHelper.makeFunctionContext(clazz, providedPropertyTypes);
+		Properties providedProperties = System.getProperties();
+		Properties unusedProperties = new Properties();
+
+		Map<String, Object> functionContext = FunctionContextHelper.makeFunctionContext(clazz, providedPropertyTypes, providedProperties, unusedProperties, true);
 
 		assertEquals(3, functionContext.size());
 		assertEquals("Mark Smith", functionContext.get("myName"));
@@ -392,15 +369,19 @@ public class FunctionContextHelperTest {
 
 	@Test
 	public void makeFunctionContextWithPropertyFileWithSystemProperty() {
-		Class<? extends AbstractFunction> clazz = AnotherTestFunction.class;
+		Class<? extends AbstractFunction<AnotherTestFunction>> clazz = AnotherTestFunction.class;
 
 		Map<String, Class<?>> providedPropertyTypes = new HashMap<>();
+		providedPropertyTypes.put("myName", String.class);
 		providedPropertyTypes.put("myGender", SEXE.class);
 		providedPropertyTypes.put("myBirthDate", LocalDate.class);
 
-		System.setProperty("myGender", "FEMALE");
+		setSystemProperty("myGender.value", "FEMALE");
 
-		Map<String, Object> functionContext = FunctionContextHelper.makeFunctionContext(clazz, providedPropertyTypes);
+		Properties providedProperties = System.getProperties();
+		Properties unusedProperties = new Properties();
+
+		Map<String, Object> functionContext = FunctionContextHelper.makeFunctionContext(clazz, providedPropertyTypes, providedProperties, unusedProperties, true);
 
 		assertEquals(3, functionContext.size());
 		assertEquals("Mark Smith", functionContext.get("myName"));

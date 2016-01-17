@@ -1,7 +1,5 @@
 package nl.smith.mathematics.functions.decimal;
 
-import java.math.BigInteger;
-
 import nl.smith.mathematics.functions.AngleType;
 import nl.smith.mathematics.functions.GoniometricFunctions;
 import nl.smith.mathematics.functions.annotation.FunctionProperty;
@@ -14,36 +12,29 @@ import org.springframework.stereotype.Component;
 @Component
 public class GoniometricFunctionsImpl extends GoniometricFunctions<DecimalNumber> {
 
-	@SuppressWarnings("unused")
 	private static final Logger LOGGER = LoggerFactory.getLogger(GoniometricFunctionsImpl.class);
 
 	@FunctionProperty
-	private BigInteger taylorNumber;
+	private final AngleType ANGELTYPE = null;
 
 	@FunctionProperty
-	private AngleType angleType;
-
-	@FunctionProperty
-	private DecimalNumber pi;
+	private final DecimalNumber PI = null;
 
 	/** Spring instantiated bean */
 	public GoniometricFunctionsImpl() {
 		super();
 	}
 
-	// Constructor for instantiating proxy
+	/** Constructor for instantiating proxy */
 	public GoniometricFunctionsImpl(GoniometricFunctionsImpl baseObject) {
-		super(baseObject);
-	}
-
-	public BigInteger getTaylorNumber() {
-		return taylorNumber;
+		LOGGER.info("Create instance proxy instance of class {} using {}", this.getClass().getCanonicalName(), baseObject.toString());
+		setFunctionProperties(baseObject);
 	}
 
 	@Override
-	public AngleType getAngleType() {
+	public AngleType getANGELTYPE() {
 		// TODO Auto-generated method stub
-		return angleType;
+		return ANGELTYPE;
 	}
 
 	@Override
@@ -53,9 +44,9 @@ public class GoniometricFunctionsImpl extends GoniometricFunctions<DecimalNumber
 	}
 
 	@Override
-	public DecimalNumber getPi() {
+	public DecimalNumber getPI() {
 		// TODO Auto-generated method stub
-		return pi;
+		return PI;
 	}
 
 	@Override
@@ -72,7 +63,7 @@ public class GoniometricFunctionsImpl extends GoniometricFunctions<DecimalNumber
 
 	@Override
 	public String toString() {
-		return "GoniometricFunctionsImpl [taylorNumber=" + taylorNumber + ", angleType=" + angleType + ", pi=" + pi + "]";
+		return "GoniometricFunctionsImpl [TAYLORNUMBER=" + getTAYLORNUMBER() + ", ANGELTYPE=" + getANGELTYPE() + ", PI=" + getPI() + "]";
 	}
 
 }

@@ -10,24 +10,26 @@ import nl.smith.mathematics.number.DecimalNumber;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 //@Component
 public class StatisticalFunctionsImpl extends StatisticalFunctions<DecimalNumber> {
 
-	@SuppressWarnings("unused")
 	private static final Logger LOGGER = LoggerFactory.getLogger(StatisticalFunctionsImpl.class);
 
 	private SimpleArithmeticFunctionsImpl simpleArithmeticFunctionsImpl;
 
 	/** Spring instantiated bean */
+	@Autowired
 	public StatisticalFunctionsImpl(SimpleArithmeticFunctionsImpl simpleArithmeticFunctionsImpl) {
-		super();
 		this.simpleArithmeticFunctionsImpl = simpleArithmeticFunctionsImpl;
+		setFunctionProperties();
 	}
 
-	// Constructor for instantiating proxy
+	/** Constructor for instantiating proxy */
 	public StatisticalFunctionsImpl(StatisticalFunctionsImpl baseObject) {
-		super(baseObject);
+		LOGGER.info("Create instance proxy instance of class {} using {}", this.getClass().getCanonicalName(), baseObject.toString());
+		setFunctionProperties(baseObject);
 	}
 
 	@Override

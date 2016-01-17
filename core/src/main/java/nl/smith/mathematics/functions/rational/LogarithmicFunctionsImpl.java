@@ -16,41 +16,38 @@ import org.springframework.stereotype.Component;
 @Component
 public class LogarithmicFunctionsImpl extends LogarithmicFunctions<RationalNumber> {
 
-	@SuppressWarnings("unused")
 	private static final Logger LOGGER = LoggerFactory.getLogger(LogarithmicFunctionsImpl.class);
-
-	@FunctionProperty
-	private BigInteger taylorNumber;
 
 	@FunctionProperty
 	private RationalNumber eulersNumber;
 
 	/** Spring instantiated bean */
 	public LogarithmicFunctionsImpl() {
-		super();
+		setFunctionProperties();
 	}
 
-	// Constructor for instantiating proxy
+	/** Constructor for instantiating proxy */
 	public LogarithmicFunctionsImpl(LogarithmicFunctionsImpl baseObject) {
-		super(baseObject);
+		LOGGER.info("Create instance proxy instance of class {} using {}", this.getClass().getCanonicalName(), baseObject.toString());
+		setFunctionProperties(baseObject);
 	}
 
-	@Override
 	public RationalNumber getEulersNumber() {
 		return eulersNumber;
 	}
 
 	/**
-	 * exp(x) = 1 + x/1! + x^2/2! + x^3/3! + x^4/4! ... T(i) = x*T(i-1)/i T(0) = 1
+	 * this.getClass().getCanonicalName(), baseObject.toString()); setFunctionProperties(baseObject); }
+	 * 
+	 * /** exp(x) = 1 + x/1! + x^2/2! + x^3/3! + x^4/4! ... T(i) = x*T(i-1)/i T(0) = 1
 	 */
 	@Override
 	@MathematicalFunction
 	public RationalNumber exp(RationalNumber number) {
-		System.out.println("Yessssssssssssssssssssss");
 		BigInteger i = ONE;
 		RationalNumber sum = new RationalNumber(ONE);
 		RationalNumber t = new RationalNumber(ONE);
-		while (i.compareTo(taylorNumber) < 0) {
+		while (i.compareTo(getTAYLORNUMBER()) < 0) {
 			t = number.multiply(t).divide(i);
 			sum = sum.add(t);
 			sum = sum.getNormalizedRationalNumber();
@@ -70,7 +67,7 @@ public class LogarithmicFunctionsImpl extends LogarithmicFunctions<RationalNumbe
 		RationalNumber sum = x;
 		RationalNumber t = x;
 		boolean subtract = true;
-		while (i.compareTo(taylorNumber) < 0) {
+		while (i.compareTo(getTAYLORNUMBER()) < 0) {
 			i = i.add(ONE);
 			t = t.multiply(x);
 			RationalNumber augend = t.divide(i);
@@ -81,15 +78,9 @@ public class LogarithmicFunctionsImpl extends LogarithmicFunctions<RationalNumbe
 		return sum;
 	}
 
-	public LogarithmicFunctionsImpl(BigInteger taylorNumber, RationalNumber eulersNumber) {
-		super();
-		this.taylorNumber = taylorNumber;
-		this.eulersNumber = eulersNumber;
-	}
-
 	@Override
 	public String toString() {
-		return "LogarithmicFunctionsImpl [taylorNumber=" + taylorNumber + ", eulersNumber=" + eulersNumber + "]";
+		return "LogarithmicFunctionsImpl [TAYLORNUMBER=" + getTAYLORNUMBER() + ", eulersNumber=" + eulersNumber + "]";
 	}
 
 }

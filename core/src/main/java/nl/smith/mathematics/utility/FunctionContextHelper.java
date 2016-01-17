@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import nl.smith.mathematics.functions.AbstractFunction;
@@ -64,6 +65,7 @@ public class FunctionContextHelper {
 	private static final Logger LOGGER = LoggerFactory.getLogger(FunctionContextHelper.class);
 
 	private static final String TYPE_SPECIFIER_STRING = ".type";
+	private static final String VALUE_SPECIFIER_STRING = ".value";
 
 	private static final String REGEX_DATE = "[0-3]\\d\\-[0-1]\\d-\\d{4}";
 	private static final String REGEX_DATE_TIME = REGEX_DATE + " [0-2]\\d:[0-5]\\d:[0-5]\\d";
@@ -83,12 +85,17 @@ public class FunctionContextHelper {
 	}
 
 	public static Map<String, Object> makeFunctionContext(Class<?> functionClass) {
-		return makeFunctionContext(functionClass, new HashMap<String, Class<?>>());
+		return makeFunctionContext(functionClass, new HashMap<String, Class<?>>(), System.getProperties(), new Properties(), false);
 	}
 
-	public static Map<String, Object> makeFunctionContext(Class<?> functionClass, Map<String, Class<?>> providedPropertyTypes) {
-		if (functionClass == null) {
-			METHOD_ARGUMENT_CAN_NOT_BE_NULL.throwUncheckedException(IllegalArgumentException.class, "functionClass");
+	public static Map<String, Object> makeFunctionContext(Class<?> functionClass, Map<String, Class<?>> providedPropertyTypes, Properties providedProperties, Properties unusedProperties,
+			boolean onlyRetrieMapForProvidedPropertyTypes) {
+		if (functionClass == null || providedPropertyTypes == null || unusedProperties == null) {
+			METHOD_ARGUMENT_CAN_NOT_BE_NULL.throwUncheckedException(IllegalArgumentException.class, "functionClass/providedPropertyTypes/unusedProperties");
+		}
+
+		if (providedPropertyTypes.isEmpty()) {
+
 		}
 
 		Map<String, Object> functionContext = new HashMap<>();
@@ -96,25 +103,43 @@ public class FunctionContextHelper {
 		Map<String, Class<?>> propertyTypes = new HashMap<>(providedPropertyTypes);
 		Map<String, String> propertyValues = new HashMap<>();
 
-		Properties properties = makePropertiesForClass(functionClass);
+		Properties properties = makePropertiesForClass(functionClass, providedProperties);
 
 		for (Entry<Object, Object> entry : properties.entrySet()) {
 			String propertyName = (String) entry.getKey();
-			if (propertyName.endsWith(TYPE_SPECIFIER_STRING)) {
+			String propertyValue = (String) entry.getValue();
+			// Note: propertyName either end with ".value" or ".type"
+			if (propertyName.endsWith(VALUE_SPECIFIER_STRING)) {
+				propertyName = StringUtils.substringBefore(propertyName, VALUE_SPECIFIER_STRING);
+				if (onlyRetrieMapForProvidedPropertyTypes) {
+					if (providedPropertyTypes.containsKey(propertyName)) {
+						propertyValues.put(propertyName, propertyValue);
+					} else {
+						unusedProperties.put(entry.getKey(), propertyValue);
+					}
+				} else {
+					propertyValues.put(propertyName, propertyValue);
+				}
+
+			} else {
 				propertyName = StringUtils.substringBefore(propertyName, TYPE_SPECIFIER_STRING);
-				Class<?> propertyType = providedPropertyTypes.get(propertyName);
-				if (propertyType == null) {
+				Class<?> propertyType = null;
+				if (onlyRetrieMapForProvidedPropertyTypes) {
+					if (providedPropertyTypes.containsKey(propertyName)) {
+						propertyType = providedPropertyTypes.get(propertyName);
+						propertyTypes.put(propertyName, propertyType);
+					} else {
+						unusedProperties.put(propertyName, (String) entry.getValue());
+					}
+				} else {
 					try {
-						propertyType = Class.forName((String) entry.getValue());
+						propertyType = Class.forName(propertyValue);
+						propertyTypes.put(propertyName, propertyType);
 					} catch (ClassNotFoundException e) {
 						CAN_NOT_LOAD_CLASS.throwUncheckedException(IllegalStateException.class, "propertyType");
 					}
-					propertyTypes.put(StringUtils.substringBefore(propertyName, TYPE_SPECIFIER_STRING), propertyType);
-				} else {
-					LOGGER.info("Property type for {} already set to {}.\nPlease remove redundant key value pair from property file.", propertyName, propertyType.getCanonicalName());
 				}
-			} else {
-				propertyValues.put(propertyName, (String) entry.getValue());
+
 			}
 		}
 
@@ -132,7 +157,15 @@ public class FunctionContextHelper {
 		return functionContext;
 	}
 
-	private static Properties makePropertiesForClass(Class<?> clazz) {
+	/**
+	 * Method to return a properties object with keys and values of type String.<br>
+	 * Keys follow the structure &lt;name&gt;.value or &lt;name&gt;.type
+	 * 
+	 * @param clazz
+	 *            The class the properties are associated with
+	 * @return A properties object
+	 */
+	private static Properties makePropertiesForClass(Class<?> clazz, Properties providedProperties) {
 		Properties properties = new Properties();
 
 		String resourceName = clazz.getSimpleName() + ".properties";
@@ -146,14 +179,11 @@ public class FunctionContextHelper {
 				Enumeration<?> propertyNames = properties.propertyNames();
 				while (propertyNames.hasMoreElements()) {
 					String propertyName = (String) propertyNames.nextElement();
-					LOGGER.debug("Property {}={}", propertyName, properties.getProperty(propertyName));
-					if (!propertyName.endsWith(TYPE_SPECIFIER_STRING)) {
-						String systemProperty = System.getProperty(propertyName);
-						if (systemProperty != null) {
-							LOGGER.info("Property {} is overriden", propertyName);
-							properties.setProperty(propertyName, systemProperty);
-							LOGGER.info("Property {}={}", propertyName, properties.getProperty(propertyName));
-						}
+					if (propertyName.endsWith(VALUE_SPECIFIER_STRING) || propertyName.endsWith(TYPE_SPECIFIER_STRING)) {
+						// Only retrieve properties with propetryName <name>.value or <name>.type
+						LOGGER.debug("Property {}={}", propertyName, properties.getProperty(propertyName));
+					} else {
+						properties.remove(propertyName);
 					}
 				}
 			} catch (IOException e) {
@@ -163,7 +193,33 @@ public class FunctionContextHelper {
 			LOGGER.info("Resource '{}' not found.\nEmpty context will be created.", resourcePath);
 		}
 
+		addProvidedProperties(properties, providedProperties);
+
 		return properties;
+	}
+
+	private static void addProvidedProperties(Properties properties, Properties providedProperties) {
+		LOGGER.info("Adding system properties");
+
+		Set<Entry<Object, Object>> entrySet = providedProperties.entrySet();
+		for (Entry<Object, Object> entry : entrySet) {
+			Object key = entry.getKey();
+			Object value = entry.getValue();
+			if (key instanceof String && value instanceof String) {
+				String propertyName = (String) key;
+				if (propertyName.endsWith(VALUE_SPECIFIER_STRING) || propertyName.endsWith(TYPE_SPECIFIER_STRING)) {
+					// Only retrieve properties with propetryName <name>.value or <name>.type
+					String stringValue = (String) value;
+					String previousValue = (String) properties.setProperty(propertyName, stringValue);
+					if (previousValue == null) {
+						LOGGER.debug("Property {}={}", propertyName, stringValue);
+					} else {
+						LOGGER.info("Property {} is overriden.\n Old value: {}.\nNew value: {}", new Object[] { propertyName, previousValue, stringValue });
+
+					}
+				}
+			}
+		}
 	}
 
 	/**

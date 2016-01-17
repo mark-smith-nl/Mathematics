@@ -14,20 +14,25 @@ import nl.smith.mathematics.functions.SimpleArithmeticFunctions;
 import nl.smith.mathematics.functions.annotation.MathematicalFunction;
 import nl.smith.mathematics.number.RationalNumber;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 @Component
 @MethodConstraint(numberType = RationalNumber.class)
 public class SimpleArithmeticFunctionsImpl extends SimpleArithmeticFunctions<RationalNumber> {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(SimpleArithmeticFunctionsImpl.class);
+
 	/** Spring instantiated bean */
 	public SimpleArithmeticFunctionsImpl() {
-		super();
+		setFunctionProperties();
 	}
 
-	// Constructor for instantiating proxy
+	/** Constructor for instantiating proxy */
 	public SimpleArithmeticFunctionsImpl(SimpleArithmeticFunctionsImpl baseObject) {
-		super(baseObject);
+		LOGGER.info("Create instance proxy instance of class {} using {}", this.getClass().getCanonicalName(), baseObject.toString());
+		setFunctionProperties(baseObject);
 	}
 
 	@Override
