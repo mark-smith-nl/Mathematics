@@ -6,7 +6,13 @@ import java.util.Set;
 
 import org.junit.After;
 
-public class SystemPropertieChanger {
+/**
+ * All test classes which change system properties should extend this class. To change a system property
+ * 
+ * @author mark
+ *
+ */
+public class SystemPropertyChanger {
 	private Set<String> addedSystemPropertyNames = new HashSet<>();
 
 	@After

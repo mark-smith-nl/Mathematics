@@ -8,7 +8,7 @@ import java.util.Properties;
 import nl.smith.mathematics.functions.AngleType;
 import nl.smith.mathematics.functions.GoniometricFunctions;
 import nl.smith.mathematics.number.RationalNumber;
-import nl.smith.mathematics.utility.SystemPropertieChanger;
+import nl.smith.mathematics.utility.SystemPropertyChanger;
 import nl.smith.mathematics.utility.TestUtility;
 
 import org.apache.commons.lang.StringUtils;
@@ -16,7 +16,7 @@ import org.junit.Test;
 
 //@RunWith(SpringJUnit4ClassRunner.class)
 // @ContextConfiguration(classes = { FunctionFinder.class })
-public class GoniometricFunctionsImplTest extends SystemPropertieChanger {
+public class GoniometricFunctionsImplTest extends SystemPropertyChanger {
 
 	// Test resource dependencies
 	private static final String COSINUS_PROPERTIES = "cosinus.properties";

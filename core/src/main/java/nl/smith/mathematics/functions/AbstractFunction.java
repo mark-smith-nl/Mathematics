@@ -38,6 +38,11 @@ public abstract class AbstractFunction<T extends AbstractFunction<?>> {
 		}
 	}
 
+	/**
+	 * Method copies all instance values of the base object to the properties of the current instance (this). Note: Both the baseobject and the current instance (this) are of the same type.
+	 * 
+	 * @param baseObject
+	 */
 	protected void setFunctionProperties(T baseObject) {
 		Class<?> clazz = this.getClass();
 
@@ -88,8 +93,10 @@ public abstract class AbstractFunction<T extends AbstractFunction<?>> {
 					canonicalPropertyName = clazz.getCanonicalName() + "." + canonicalPropertyName;
 				}
 
-				if (canonicalPropertyNameFieldMap.put(canonicalPropertyName, field) != null) {
-					throw new IllegalStateException("Implement message");
+				Field fieldMappedToCanonicalPropertyName = canonicalPropertyNameFieldMap.put(canonicalPropertyName, field);
+				if (fieldMappedToCanonicalPropertyName != null) {
+					throw new IllegalStateException(String.format("Property name %s used for %s.%s is already used for %2$s.%s", canonicalPropertyName, clazz.getCanonicalName(),
+							field.getName(), fieldMappedToCanonicalPropertyName.getName()));
 				}
 
 				canonicalPropertyNameIsNullableMap.put(canonicalPropertyName, annotation.nullable());
@@ -130,7 +137,8 @@ public abstract class AbstractFunction<T extends AbstractFunction<?>> {
 			if (initialValue == null) {
 				if (propertyValue == null && !isNullable) {
 					// TODO implement message
-					throw new IllegalStateException(String.format("Error. Value not found for: '%s.%s'.\nProperty key: '%s'.\nNo initial value specified", clazz.getCanonicalName(),
+					throw new IllegalStateException(String.format("Error. No value specified for: '%s.%s'.\nProperty key: '%s'.\nNo initial value specified.\n"
+							+ "Please add: %3$s.value=<propertyValue> and %3$s.typee=<propertyType> to property file or add as system properties.", clazz.getCanonicalName(),
 							field.getName(), canonicalPropertyName));
 				} else {
 					setPropertyValue(field, propertyValue);
@@ -165,7 +173,6 @@ public abstract class AbstractFunction<T extends AbstractFunction<?>> {
 		if (!isPublic) {
 			field.setAccessible(false);
 		}
-
 	}
 
 }

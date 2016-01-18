@@ -30,7 +30,7 @@ import org.junit.Test;
  * @author mark
  *
  */
-public class FunctionContextHelperTest extends SystemPropertieChanger {
+public class FunctionContextHelperTest extends SystemPropertyChanger {
 
 	public static enum SEXE {
 		MALE, FEMALE

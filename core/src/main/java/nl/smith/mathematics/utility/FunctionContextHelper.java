@@ -199,7 +199,7 @@ public class FunctionContextHelper {
 	}
 
 	private static void addProvidedProperties(Properties properties, Properties providedProperties) {
-		LOGGER.info("Adding system properties");
+		LOGGER.info("Adding provided properties");
 
 		Set<Entry<Object, Object>> entrySet = providedProperties.entrySet();
 		for (Entry<Object, Object> entry : entrySet) {

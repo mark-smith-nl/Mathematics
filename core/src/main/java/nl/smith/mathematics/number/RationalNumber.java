@@ -16,8 +16,7 @@ import org.apache.commons.lang.StringUtils;
 /**
  * Immutable class for storing rational numbers.
  * 
- * Rational numbers contain two components the numerator and denominator. The numerator and denominator are <b>NOT</b> normalized.
- * The denominator is N+
+ * Rational numbers contain two components the numerator and denominator. The numerator and denominator are <b>NOT</b> normalized. The denominator is N+
  * 
  * @author M. Smith
  */
@@ -28,17 +27,38 @@ public class RationalNumber implements NumberOperations<RationalNumber> {
 	/** Note the denominator is always a positive integer */
 	private final BigInteger denominator;
 
+	/**
+	 * Create an instance using 1 as denominator
+	 * 
+	 * @param numerator
+	 */
 	public RationalNumber(BigInteger numerator) {
 		this(numerator, ONE, true);
 	}
 
+	/**
+	 * Create an instance using 1 as denominator
+	 * 
+	 * @param numerator
+	 */
 	public RationalNumber(long numerator) {
 		this(BigInteger.valueOf(numerator), BigInteger.valueOf(1), false);
 	}
 
+	/**
+	 * 
+	 * @param numerator
+	 * @param denominator
+	 */
 	public RationalNumber(long numerator, long denominator) {
 		this(BigInteger.valueOf(numerator), BigInteger.valueOf(denominator), true);
 	}
+
+	/**
+	 * 
+	 * @param numerator
+	 * @param denominator
+	 */
 
 	public RationalNumber(BigInteger numerator, BigInteger denominator) {
 		this(numerator, denominator, true);
@@ -57,8 +77,7 @@ public class RationalNumber implements NumberOperations<RationalNumber> {
 		BigInteger numerator = new BigInteger(signedIntegerPart + nonRepeatingFractionalPart + repeatingFractionalPart).subtract(new BigInteger(signedIntegerPart
 				+ nonRepeatingFractionalPart));
 
-		BigInteger denominator = getTenPowExponent(nonRepeatingFractionalPart.length() + repeatingFractionalPart.length())
-				.subtract(getTenPowExponent(nonRepeatingFractionalPart.length()));
+		BigInteger denominator = getTenPowExponent(nonRepeatingFractionalPart.length() + repeatingFractionalPart.length()).subtract(getTenPowExponent(nonRepeatingFractionalPart.length()));
 
 		int exponent = Integer.valueOf(exponentPart);
 
@@ -351,8 +370,8 @@ public class RationalNumber implements NumberOperations<RationalNumber> {
 	}
 
 	/**
-	 * Returns the numerator and denominator as well as the normalized numerator and denominator as a string. Example the rational number 2/6 will be shown as: Numerator: 2
-	 * Denominator: 6 Normalized: Numerator: 1 Denominator: 3
+	 * Returns the numerator and denominator as well as the normalized numerator and denominator as a string. Example the rational number 2/6 will be shown as: Numerator: 2 Denominator: 6
+	 * Normalized: Numerator: 1 Denominator: 3
 	 */
 	@Override
 	public String toString() {
@@ -398,9 +417,8 @@ public class RationalNumber implements NumberOperations<RationalNumber> {
 
 	/**
 	 * Method for calculating the digits after the decimal points of the division remainder/denominator. <br>
-	 * The result exactly describes the devision
-	 * If the result can not be represented as a finite number of digits the repeating part of digits is represented as a list of one ore more digits enclosed in curly braces and
-	 * appended with an R. <br>
+	 * The result exactly describes the devision If the result can not be represented as a finite number of digits the repeating part of digits is represented as a list of one ore more
+	 * digits enclosed in curly braces and appended with an R. <br>
 	 * At least one of the digits in the digits between braces is not <b>0.</b> <br>
 	 * <br>
 	 * Protected for test purposes
@@ -408,9 +426,7 @@ public class RationalNumber implements NumberOperations<RationalNumber> {
 	 * @param remainder
 	 *            remainder element N+ or zero
 	 * @param denominator
-	 *            RationalNumber minusOneDivSeven = new RationalNumber(ONE, BigInteger.valueOf(-7));
-	 *            assertEquals("-0.1", minusOneDivSeven.toString(1, showDelta));
-	 *            denominator N+
+	 *            RationalNumber minusOneDivSeven = new RationalNumber(ONE, BigInteger.valueOf(-7)); assertEquals("-0.1", minusOneDivSeven.toString(1, showDelta)); denominator N+
 	 * @return
 	 */
 	protected static void divisionAsString(StringBuffer resultBuffer, BigInteger remainder, BigInteger denominator) {
